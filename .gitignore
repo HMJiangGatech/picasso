@@ -23,6 +23,7 @@
 .RData
 .Ruserdata
 R-package/*.Rproj
+*.tar.gz
 
 #CLion
 .idea
@@ -37,4 +38,3 @@ python-package/build
 python-package/doc/build
 python-package/dist
 python-package/*.egg-info/
-
