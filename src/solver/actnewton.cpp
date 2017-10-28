@@ -1,6 +1,7 @@
 #include <picasso/actnewton.hpp>
 #include <picasso/objective.hpp>
 #include <picasso/solver_params.hpp>
+#include <R.h>
 
 namespace picasso {
 namespace solver {
@@ -59,10 +60,11 @@ void ActNewtonSolver::solve() {
     else
       threshold = 2 * lambdas[i];
 
-    for (int j = 0; j < d; ++j) {
+    for (int j = 0; j < d; ++j)
       stage_lambdas[j] = lambdas[i];
 
-      if (grad[j] > threshold) actset_indcat[j] = 1;
+    for (int j = 0; j < d; ++j) {
+      if (grad[j] > threshold) {actset_indcat[j] = 1; break;}
     }
 
     m_obj->update_auxiliary();
@@ -143,17 +145,26 @@ void ActNewtonSolver::solve() {
 
         // check stopping criterion 2: active set change
         bool new_active_idx = false;
+        double largestGrad;
+        int largestGradIdx=-1;
         for (int k = 0; k < d; k++)
           if (actset_indcat[k] == 0) {
             m_obj->update_gradient(k);
             grad[k] = fabs(m_obj->get_grad(k));
             if (grad[k] > stage_lambdas[k]) {
-              actset_indcat[k] = 1;
-              new_active_idx = true;
+              if(largestGradIdx=-1 || grad[k]>largestGrad)
+              {
+                largestGrad = grad[k];
+                largestGradIdx = k;
+                new_active_idx = true;
+              }
             }
           }
+        if(new_active_idx)
+          actset_indcat[largestGradIdx] = 1;
 
-        if (!new_active_idx) break;
+        //if (!new_active_idx) break;
+        break;
       }
 
       // Rprintf("---loop level 1 cnt:%d\n", loopcnt_level_1);
