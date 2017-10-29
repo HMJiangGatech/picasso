@@ -42,11 +42,27 @@ void ActGDSolver::solve() {
     // m_obj->update_auxiliary();
     regfunc->set_param(lambdas[i], m_param.gamma);
 
+    // Multi update
     for (int j = 0; j < d; j++)
       if (actset_indcat[j] == 0) {
         tmp = regfunc->threshold(fabs(grad[j]));
         if (fabs(tmp) > 1e-8) actset_indcat[j] = 1;
       }
+
+    // Single update
+    // double max_temp = -1;
+    // double max_temp_id = -1;
+    // for (int j = 0; j < d; j++)
+    //   if (actset_indcat[j] == 0) {
+    //     tmp = regfunc->threshold(fabs(grad[j]));
+    //     if (fabs(tmp) > 1e-8 )
+    //     if (max_temp < fabs(tmp)) {
+    //       max_temp = fabs(tmp);
+    //       max_temp_id = j;
+    //     }
+    //   }
+    // if(max_temp_id != -1)
+    //   actset_indcat[max_temp_id] = 1;
 
     int loopcnt_level_0 = 0;
     flag2 = 1;
@@ -91,6 +107,7 @@ void ActGDSolver::solve() {
           break;
         }
 
+        // Multi Update
         new_active_idx = false;
         for (int j = 0; j < d; j++)
           if (actset_indcat[j] == 0) {
@@ -102,6 +119,27 @@ void ActGDSolver::solve() {
               new_active_idx = true;
             }
           }
+
+        // Single Update
+        // new_active_idx = false;
+        // double max_temp = -1;
+        // int max_temp_id = -1;
+        // for (int j = 0; j < d; j++)
+        //   if (actset_indcat[j] == 0) {
+        //     m_obj->update_gradient(j);
+        //     grad[j] = fabs(m_obj->get_grad(j));
+        //     double tmp = regfunc->threshold(grad[j]);
+        //     if (fabs(tmp) > 1e-8) {
+        //       if(max_temp < fabs(tmp))
+        //       {
+        //         new_active_idx = true;
+        //         max_temp_id = j;
+        //         max_temp = fabs(tmp);
+        //       }
+        //     }
+        //   }
+        // if(new_active_idx)
+        //   actset_indcat[max_temp_id] = 1;
 
         if (!new_active_idx) break;
       }

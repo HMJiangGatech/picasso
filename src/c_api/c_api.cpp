@@ -4,6 +4,7 @@
 #include <picasso/objective.hpp>
 #include <picasso/solver_params.hpp>
 #include <vector>
+#include <R.h>
 
 void picasso_actnewton_solver(
     picasso::ObjFunction *obj,
@@ -26,6 +27,7 @@ void picasso_actnewton_solver(
     int *size_act,   // output: an array of solution sparsity (model df)
     double *runt     // output: runtime
 ) {
+Rprintf("-------------------picasso_actnewton_solver\n");
   picasso::solver::PicassoSolverParams param;
   param.set_lambdas(lambda, nlambda);
   param.gamma = gamma;
@@ -81,6 +83,7 @@ void picasso_actgd_solver(
     int *size_act,   // output: an array of solution sparsity (model df)
     double *runt     // output: runtime
 ) {
+Rprintf("-------------------picasso_actgd_solver\n");
   picasso::solver::PicassoSolverParams param;
   param.set_lambdas(lambda, nlambda);
   param.gamma = gamma;
@@ -132,6 +135,7 @@ extern "C" void SolveLogisticRegression(
     int *size_act,   // output: an array of solution sparsity (model df)
     double *runt     // output: runtime
 ) {
+Rprintf("-------------------SolveLogisticRegression\n");
   picasso::ObjFunction *obj =
       new picasso::LogisticObjective(X, Y, n, d, intercept);
   picasso_actnewton_solver(obj, Y, X, n, d, lambda, nlambda, gamma, max_ite,
@@ -159,6 +163,7 @@ extern "C" void SolvePoissonRegression(
     int *size_act,   // output: an array of solution sparsity (model df)
     double *runt     // output: runtime
 ) {
+Rprintf("-------------------SolvePoissonRegression\n");
   picasso::ObjFunction *obj =
       new picasso::PoissonObjective(X, Y, nn, dd, intercept);
   picasso_actnewton_solver(obj, Y, X, nn, dd, lambda, nnlambda, gamma, mmax_ite,
@@ -186,6 +191,7 @@ extern "C" void SolveSqrtLinearRegression(
     int *size_act,   // output: an array of solution sparsity (model df)
     double *runt     // output: runtime
 ) {
+Rprintf("-------------------SolveSqrtLinearRegression\n");
   picasso::ObjFunction *obj =
       new picasso::SqrtMSEObjective(X, Y, nn, dd, intercept);
 
@@ -214,6 +220,7 @@ extern "C" void SolveLinearRegressionNaiveUpdate(
     int *size_act,   // output: an array of solution sparsity (model df)
     double *runt     // output: runtime
 ) {
+Rprintf("-------------------SolveLinearRegressionNaiveUpdate\n");
   picasso::ObjFunction *obj =
       new picasso::GaussianNaiveUpdateObjective(X, Y, nn, dd, intercept);
   picasso_actgd_solver(obj, Y, X, nn, dd, lambda, nnlambda, gamma, mmax_ite,
@@ -241,6 +248,7 @@ extern "C" void SolveLinearRegressionCovUpdate(
     int *size_act,   // output: an array of solution sparsity (model df)
     double *runt     // output: runtime
 ) {
+Rprintf("-------------------SolveLinearRegressionCovUpdate\n");
   picasso::ObjFunction *obj =
       new picasso::GaussianNaiveUpdateObjective(X, Y, nn, dd, intercept);
   picasso_actgd_solver(obj, Y, X, nn, dd, lambda, nnlambda, gamma, mmax_ite,

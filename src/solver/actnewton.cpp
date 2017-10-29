@@ -1,7 +1,6 @@
 #include <picasso/actnewton.hpp>
 #include <picasso/objective.hpp>
 #include <picasso/solver_params.hpp>
-#include <R.h>
 
 namespace picasso {
 namespace solver {
@@ -60,12 +59,27 @@ void ActNewtonSolver::solve() {
     else
       threshold = 2 * lambdas[i];
 
-    for (int j = 0; j < d; ++j)
+    // Multi Update
+    for (int j = 0; j < d; ++j) {
       stage_lambdas[j] = lambdas[i];
 
-    for (int j = 0; j < d; ++j) {
-      if (grad[j] > threshold) {actset_indcat[j] = 1; break;}
+      if (grad[j] > threshold) actset_indcat[j] = 1;
     }
+
+    // Single update
+    // double max_temp = -1;
+    // double max_temp_id = -1;
+    // for (int j = 0; j < d; ++j) {
+    //   stage_lambdas[j] = lambdas[i];
+    //
+    //   if (grad[j] > threshold)
+    //   if (max_temp < grad[j] || max_temp_id == -1) {
+    //     max_temp = grad[j];
+    //     max_temp_id = j;
+    //   }
+    // }
+    // if(max_temp_id != -1)
+    //   actset_indcat[max_temp_id] = 1;
 
     m_obj->update_auxiliary();
     // loop level 0: multistage convex relaxation
@@ -144,27 +158,37 @@ void ActNewtonSolver::solve() {
         if (terminate_loop_level_1) break;
 
         // check stopping criterion 2: active set change
+        // Multi Update
         bool new_active_idx = false;
-        double largestGrad;
-        int largestGradIdx=-1;
         for (int k = 0; k < d; k++)
           if (actset_indcat[k] == 0) {
             m_obj->update_gradient(k);
             grad[k] = fabs(m_obj->get_grad(k));
             if (grad[k] > stage_lambdas[k]) {
-              if(largestGradIdx=-1 || grad[k]>largestGrad)
-              {
-                largestGrad = grad[k];
-                largestGradIdx = k;
-                new_active_idx = true;
-              }
+              actset_indcat[k] = 1;
+              new_active_idx = true;
             }
           }
-        if(new_active_idx)
-          actset_indcat[largestGradIdx] = 1;
 
-        //if (!new_active_idx) break;
-        break;
+        //Single Update
+        // double max_temp = -1;
+        // double max_temp_id = -1;
+        // bool new_active_idx = false;
+        // for (int k = 0; k < d; k++)
+        //   if (actset_indcat[k] == 0) {
+        //     m_obj->update_gradient(k);
+        //     grad[k] = fabs(m_obj->get_grad(k));
+        //     if (grad[k] > stage_lambdas[k])
+        //     if (max_temp_id==-1||max_temp<grad[k]){
+        //       max_temp = grad[k];
+        //       max_temp_id = k;
+        //       new_active_idx = true;
+        //     }
+        //   }
+        // if(max_temp_id != -1)
+        //   actset_indcat[max_temp_id] = true;
+
+        if (!new_active_idx) break;
       }
 
       // Rprintf("---loop level 1 cnt:%d\n", loopcnt_level_1);
