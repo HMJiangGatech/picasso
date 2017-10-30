@@ -138,7 +138,7 @@ extern "C" void SolveLogisticRegression(
 Rprintf("-------------------SolveLogisticRegression\n");
   picasso::ObjFunction *obj =
       new picasso::LogisticObjective(X, Y, n, d, intercept);
-  picasso_actnewton_solver(obj, Y, X, n, d, lambda, nlambda, gamma, max_ite,
+  picasso_actgd_solver(obj, Y, X, n, d, lambda, nlambda, gamma, max_ite,
                            pprec, reg_type, intercept, beta, intcpt, ite_lamb,
                            size_act, runt);
 }
@@ -166,7 +166,7 @@ extern "C" void SolvePoissonRegression(
 Rprintf("-------------------SolvePoissonRegression\n");
   picasso::ObjFunction *obj =
       new picasso::PoissonObjective(X, Y, nn, dd, intercept);
-  picasso_actnewton_solver(obj, Y, X, nn, dd, lambda, nnlambda, gamma, mmax_ite,
+  picasso_actgd_solver(obj, Y, X, nn, dd, lambda, nnlambda, gamma, mmax_ite,
                            pprec, reg_type, intercept, beta, intcpt, ite_lamb,
                            size_act, runt);
 }
@@ -195,7 +195,7 @@ Rprintf("-------------------SolveSqrtLinearRegression\n");
   picasso::ObjFunction *obj =
       new picasso::SqrtMSEObjective(X, Y, nn, dd, intercept);
 
-  picasso_actnewton_solver(obj, Y, X, nn, dd, lambda, nnlambda, gamma, mmax_ite,
+  picasso_actgd_solver(obj, Y, X, nn, dd, lambda, nnlambda, gamma, mmax_ite,
                            pprec, reg_type, intercept, beta, intcpt, ite_lamb,
                            size_act, runt);
 }
@@ -223,7 +223,7 @@ extern "C" void SolveLinearRegressionNaiveUpdate(
 Rprintf("-------------------SolveLinearRegressionNaiveUpdate\n");
   picasso::ObjFunction *obj =
       new picasso::GaussianObjective(X, Y, nn, dd, intercept);
-  picasso_actnewton_solver(obj, Y, X, nn, dd, lambda, nnlambda, gamma, mmax_ite,
+  picasso_actgd_solver(obj, Y, X, nn, dd, lambda, nnlambda, gamma, mmax_ite,
                        pprec, reg_type, intercept, beta, intcpt, ite_lamb,
                        size_act, runt);
 }
@@ -251,7 +251,7 @@ extern "C" void SolveLinearRegressionCovUpdate(
 Rprintf("-------------------SolveLinearRegressionCovUpdate\n");
   picasso::ObjFunction *obj =
       new picasso::GaussianObjective(X, Y, nn, dd, intercept);
-  picasso_actnewton_solver(obj, Y, X, nn, dd, lambda, nnlambda, gamma, mmax_ite,
+  picasso_actgd_solver(obj, Y, X, nn, dd, lambda, nnlambda, gamma, mmax_ite,
                        pprec, reg_type, intercept, beta, intcpt, ite_lamb,
                        size_act, runt);
 }
