@@ -1,6 +1,7 @@
 #include <picasso/actnewton.hpp>
 #include <picasso/objective.hpp>
 #include <picasso/solver_params.hpp>
+// #include <R.h>
 
 namespace picasso {
 namespace solver {
@@ -30,7 +31,9 @@ void ActNewtonSolver::solve() {
   std::vector<double> grad_master(d);
   std::vector<double> Xb_master(n);
 
-  for (int i = 0; i < d; i++) grad[i] = fabs(m_obj->get_grad(i));
+  for (int i = 0; i < d; i++) {grad[i] = fabs(m_obj->get_grad(i));
+    // Rprintf("grad[j] = %lf \n",grad[i]);
+  }
 
   // model parameters on the master path
   // each master parameter is relaxed into SCAD/MCP parameter
@@ -43,6 +46,7 @@ void ActNewtonSolver::solve() {
   RegFunction *regfunc = new RegL1();
   for (int i = 0; i < lambdas.size(); i++) {
     // Rprintf("lambda[%d]:%f\n", i, lambdas[i]);
+    // Rprintf("start with the previous solution on the master path\n");
     // start with the previous solution on the master path
     m_obj->set_model_param(model_master);
     m_obj->set_model_Xb(Xb_master);
@@ -52,6 +56,7 @@ void ActNewtonSolver::solve() {
       actset_indcat[j] = actset_indcat_master[j];
     }
 
+    // Rprintf("init the active set\n");
     // init the active set
     double threshold;
     if (i > 0)
@@ -62,7 +67,6 @@ void ActNewtonSolver::solve() {
     // Multi Update
     for (int j = 0; j < d; ++j) {
       stage_lambdas[j] = lambdas[i];
-
       if (grad[j] > threshold) actset_indcat[j] = 1;
     }
 
@@ -88,12 +92,14 @@ void ActNewtonSolver::solve() {
     double old_beta, old_intcpt, updated_coord, beta;
     while (loopcnt_level_0 < m_param.num_relaxation_round) {
       loopcnt_level_0++;
+      // Rprintf("loopcnt_level_0 = %d\n",loopcnt_level_0);
 
       // loop level 1: active set update
       int loopcnt_level_1 = 0;
       bool terminate_loop_level_1 = true;
       while (loopcnt_level_1 < m_param.max_iter) {
         loopcnt_level_1++;
+        // Rprintf("\t loopcnt_level_1 = %d\n",loopcnt_level_1);
         terminate_loop_level_1 = true;
 
         old_intcpt = m_obj->get_model_coef(-1);
@@ -105,7 +111,7 @@ void ActNewtonSolver::solve() {
           if (actset_indcat[j]) {
             regfunc->set_param(stage_lambdas[j], 0.0);
             updated_coord = m_obj->coordinate_descent(regfunc, j);
-
+            // Rprintf("\t updated_coord: %lf",updated_coord);
             if (fabs(updated_coord) > 0) actset_idx.push_back(j);
           }
 
@@ -114,6 +120,7 @@ void ActNewtonSolver::solve() {
         bool terminate_loop_level_2 = true;
         while (loopcnt_level_2 < m_param.max_iter) {
           loopcnt_level_2++;
+          // Rprintf("\t\t loopcnt_level_2 = %d; actset_idx.size: %d\n",loopcnt_level_2, actset_idx.size());
           terminate_loop_level_2 = true;
 
           for (int k = 0; k < actset_idx.size(); k++) {
@@ -122,6 +129,7 @@ void ActNewtonSolver::solve() {
             old_beta = m_obj->get_model_coef(idx);
             regfunc->set_param(stage_lambdas[idx], 0.0);
 
+            //m_obj->update_gradient(idx); // added by haoming
             m_obj->coordinate_descent(regfunc, idx);
 
             if (m_obj->get_local_change(old_beta, idx) > dev_thr)

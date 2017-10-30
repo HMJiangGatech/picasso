@@ -1,4 +1,5 @@
 #include <picasso/objective.hpp>
+// #include <R.h>
 
 namespace picasso {
 GLMObjective::GLMObjective(const double *xmat, const double *y, int n, int d)
@@ -112,6 +113,7 @@ void GLMObjective::update_auxiliary() {
 void GLMObjective::update_gradient(int idx) {
   gr[idx] = 0.0;
   for (int i = 0; i < n; i++) gr[idx] += (Y[i] - p[i]) * X[idx][i] / n;
+  // if(idx==5) Rprintf("grad[j] = %lf; Y[5] = %lf; p[5] = %lf; X[idx][5] = %lf; n = %d; \n",gr[idx], Y[5], p[5], X[idx][5], n);
 }
 
 double GLMObjective::get_local_change(double old, int idx) {
@@ -129,10 +131,10 @@ double GLMObjective::get_local_change(double old, int idx) {
 LogisticObjective::LogisticObjective(const double *xmat, const double *y, int n,
                                      int d)
     : GLMObjective(xmat, y, n, d) {
+  model_param.intercept = 0.0;
   update_auxiliary();
 
   for (int i = 0; i < d; i++) update_gradient(i);
-  model_param.intercept = 0.0;
 
   deviance = fabs(eval());
 };
@@ -140,10 +142,10 @@ LogisticObjective::LogisticObjective(const double *xmat, const double *y, int n,
 LogisticObjective::LogisticObjective(const double *xmat, const double *y, int n,
                                      int d, bool include_intercept)
     : GLMObjective(xmat, y, n, d, include_intercept) {
+  model_param.intercept = 0.0;
   update_auxiliary();
   for (int i = 0; i < d; i++) update_gradient(i);
 
-  model_param.intercept = 0.0;
   update_auxiliary();
 
   deviance = fabs(eval());
@@ -152,6 +154,7 @@ LogisticObjective::LogisticObjective(const double *xmat, const double *y, int n,
 void LogisticObjective::update_key_aux() {
   for (int i = 0; i < n; i++) {
     p[i] = 1.0 / (1.0 + exp(-model_param.intercept - Xb[i]));
+    // Rprintf("p[i] = %lf\n", p[i]);
     w[i] = p[i] * (1 - p[i]);
   }
 }
@@ -169,10 +172,10 @@ double LogisticObjective::eval() {
 PoissonObjective::PoissonObjective(const double *xmat, const double *y, int n,
                                    int d)
     : GLMObjective(xmat, y, n, d) {
+  model_param.intercept = 0.0;
   update_auxiliary();
 
   for (int i = 0; i < d; i++) update_gradient(i);
-  model_param.intercept = 0.0;
 
   deviance = fabs(eval());
 };
@@ -180,10 +183,10 @@ PoissonObjective::PoissonObjective(const double *xmat, const double *y, int n,
 PoissonObjective::PoissonObjective(const double *xmat, const double *y, int n,
                                    int d, bool include_intercept)
     : GLMObjective(xmat, y, n, d, include_intercept) {
+  model_param.intercept = 0.0;
   update_auxiliary();
   for (int i = 0; i < d; i++) update_gradient(i);
 
-  model_param.intercept = 0.0;
   update_auxiliary();
 
   deviance = fabs(eval());
@@ -202,5 +205,55 @@ double PoissonObjective::eval() {
     v = v + p[i] - Y[i] * (model_param.intercept + Xb[i]);
   return (v / n);
 }
+
+
+
+
+
+GaussianObjective::GaussianObjective(const double *xmat, const double *y, int n,
+                                     int d)
+    : GLMObjective(xmat, y, n, d) {
+  model_param.intercept = 0.0;
+  update_auxiliary();
+
+  for (int i = 0; i < d; i++) update_gradient(i);
+
+  deviance = fabs(eval());
+};
+
+GaussianObjective::GaussianObjective(const double *xmat, const double *y, int n,
+                                     int d, bool include_intercept)
+    : GLMObjective(xmat, y, n, d, include_intercept) {
+  model_param.intercept = 0.0;
+  update_auxiliary();
+  for (int i = 0; i < d; i++) update_gradient(i);
+
+  update_auxiliary();
+
+  deviance = fabs(eval());
+};
+
+void GaussianObjective::update_key_aux() {
+  // Rprintf("model_param.intercept: %lf; Xb[5] = %lf\n",model_param.intercept, Xb[5]);
+  for (int i = 0; i < n; i++) {
+    p[i] = model_param.intercept + Xb[i];
+    // Rprintf("p[i] = %lf\n", p[i]);
+    w[i] = 1;
+  }
+}
+
+double GaussianObjective::eval() {
+  double v = 0.0;
+  for (int i = 0; i < n; i++) {
+    double pred = model_param.intercept+Xb[i];
+    v += pow(Y[i] - pred,2);
+  }
+  v = v / n;
+  return v;
+}
+
+
+
+
 
 }  // namespace picasso

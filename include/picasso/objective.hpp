@@ -228,6 +228,17 @@ class LogisticObjective : public GLMObjective {
 
   double eval();
 };
+class GaussianObjective : public GLMObjective {
+ public:
+  GaussianObjective(const double *xmat, const double *y, int n, int d);
+
+  GaussianObjective(const double *xmat, const double *y, int n, int d,
+                    bool include_intercept);
+
+  void update_key_aux();
+
+  double eval();
+};
 
 class PoissonObjective : public GLMObjective {
  public:

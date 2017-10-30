@@ -1,5 +1,6 @@
 #include <picasso/actgd.hpp>
 #include <picasso/objective.hpp>
+// #include <R.h>
 
 namespace picasso {
 namespace solver {
@@ -23,7 +24,9 @@ void ActGDSolver::solve() {
   actset_idx.clear();
 
   std::vector<double> grad(d, 0);
-  for (int i = 0; i < d; i++) grad[i] = m_obj->get_grad(i);
+  for (int i = 0; i < d; i++) {grad[i] = m_obj->get_grad(i);
+    //Rprintf("grad[j] = %lf \n",grad[i]);
+  }
 
   std::vector<double> old_coef(d);
 

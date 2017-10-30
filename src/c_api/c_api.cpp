@@ -222,8 +222,8 @@ extern "C" void SolveLinearRegressionNaiveUpdate(
 ) {
 Rprintf("-------------------SolveLinearRegressionNaiveUpdate\n");
   picasso::ObjFunction *obj =
-      new picasso::GaussianNaiveUpdateObjective(X, Y, nn, dd, intercept);
-  picasso_actgd_solver(obj, Y, X, nn, dd, lambda, nnlambda, gamma, mmax_ite,
+      new picasso::GaussianObjective(X, Y, nn, dd, intercept);
+  picasso_actnewton_solver(obj, Y, X, nn, dd, lambda, nnlambda, gamma, mmax_ite,
                        pprec, reg_type, intercept, beta, intcpt, ite_lamb,
                        size_act, runt);
 }
@@ -250,8 +250,8 @@ extern "C" void SolveLinearRegressionCovUpdate(
 ) {
 Rprintf("-------------------SolveLinearRegressionCovUpdate\n");
   picasso::ObjFunction *obj =
-      new picasso::GaussianNaiveUpdateObjective(X, Y, nn, dd, intercept);
-  picasso_actgd_solver(obj, Y, X, nn, dd, lambda, nnlambda, gamma, mmax_ite,
+      new picasso::GaussianObjective(X, Y, nn, dd, intercept);
+  picasso_actnewton_solver(obj, Y, X, nn, dd, lambda, nnlambda, gamma, mmax_ite,
                        pprec, reg_type, intercept, beta, intcpt, ite_lamb,
                        size_act, runt);
 }
