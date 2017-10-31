@@ -1,14 +1,104 @@
 #include <picasso/actnewton.hpp>
 #include <picasso/objective.hpp>
 #include <picasso/solver_params.hpp>
-// #include <R.h>
+#include <picasso/solver_params.hpp>
+
+#include <queue>
+#define MAXUPDATECORDNUM 100000
+
+#include <R.h>
 
 namespace picasso {
 namespace solver {
+struct CompareByFirst {
+    constexpr bool operator()(std::pair<double, int> const & a,
+                              std::pair<double, int> const & b) const noexcept
+    { return a.first > b.first; }
+};
+
+
+
 ActNewtonSolver::ActNewtonSolver(ObjFunction *obj, PicassoSolverParams param)
     : m_param(param), m_obj(obj) {
-  itercnt_path.clear();
-  solution_path.clear();
+   itercnt_path.clear();
+   solution_path.clear();
+}
+
+void ActNewtonSolver::solve_lasso() {
+  unsigned int d = m_obj->get_dim();
+  unsigned int n = m_obj->get_sample_num();
+  const std::vector<double> &lambdas = m_param.get_lambda_path();
+
+  std::vector<bool> actset_is(d, 0);
+  std::vector<int> actset_idx;
+
+  RegFunction *regfunc = new RegL1();
+
+  double zeta = 0;
+  double delta = m_param.prec;
+
+  // Loop for lambdas
+  for (int lambda_id = 0; lambda_id < lambdas.size(); lambda_id++){
+    double lambda = lambdas[lambda_id];
+
+    // Initialize active set
+    for (int  i = 0; i < d; i++) {
+      if (m_obj->get_model_coef(i) != 0)
+        actset_is[i] = true;
+      else if (fabs(m_obj->get_grad(i))>=(1-zeta)*lambda)
+        actset_is[i] = true;
+    }
+
+    int outer_loop_id = 0;
+    // Outer Loop: Multistage Convex Relaxation
+    while (m_obj->kkt_val(lambda)>m_param.prec*lambda){
+      outer_loop_id++;
+      Rprintf("outer_loop_id:%d\n",outer_loop_id );
+
+      // initialize actset_idx
+      actset_idx.clear();
+      for (int j = 0; j < d; j++)
+        if (actset_is[j])
+          actset_idx.push_back(j);
+
+      int inner_loop_id = 0;
+      // Inner Loop: Proximal Newton on Active Set
+      while (m_obj->kkt_val_act(lambda, actset_is)>m_param.prec*lambda){
+        inner_loop_id++;
+        Rprintf("\tinner_loop_id:%d, kkt:%lf, stopping c: %lf\n",inner_loop_id,m_obj->kkt_val_act(lambda, actset_is) , m_param.prec*lambda);
+        // update coordinate
+        for (int k = 0; k < actset_idx.size(); k++) {
+          int idx = actset_idx[k];
+          m_obj->coordinate_descent_l1(lambda, idx);
+        }
+
+        // update intercept
+        if (m_param.include_intercept)
+          m_obj->intercept_update();
+          
+        m_obj->update_auxiliary();
+        m_obj->update_key_aux();
+        for (int i = 0; i < d; i++) m_obj->update_gradient(i);
+        if(inner_loop_id>10) break;
+      } // Inner Loop
+
+
+      // Update active set
+      for (int  i = 0; i < d; i++) {
+        if (m_obj->get_model_coef(i) != 0)
+          actset_is[i] = true;
+        else if (fabs(m_obj->get_grad(i))>=(1-zeta)*lambda)
+          actset_is[i] = true;
+      }
+
+      if(outer_loop_id>10) break;
+    } // Outer Loop
+
+    // save the solution_path for each lambda
+    solution_path.push_back(m_obj->get_model_param());
+  } // Loop for lambdas
+
+
 }
 
 void ActNewtonSolver::solve() {
@@ -65,10 +155,10 @@ void ActNewtonSolver::solve() {
       threshold = 2 * lambdas[i];
 
     // Multi Update
-    for (int j = 0; j < d; ++j) {
-      stage_lambdas[j] = lambdas[i];
-      if (grad[j] > threshold) actset_indcat[j] = 1;
-    }
+    // for (int j = 0; j < d; ++j) {
+    //   stage_lambdas[j] = lambdas[i];
+    //   if (grad[j] > threshold) actset_indcat[j] = 1;
+    // }
 
     // Single update
     // double max_temp = -1;
@@ -76,7 +166,7 @@ void ActNewtonSolver::solve() {
     // for (int j = 0; j < d; ++j) {
     //   stage_lambdas[j] = lambdas[i];
     //
-    //   if (grad[j] > threshold)
+    // if (grad[j] > threshold)
     //   if (max_temp < grad[j] || max_temp_id == -1) {
     //     max_temp = grad[j];
     //     max_temp_id = j;
@@ -84,6 +174,31 @@ void ActNewtonSolver::solve() {
     // }
     // if(max_temp_id != -1)
     //   actset_indcat[max_temp_id] = 1;
+
+
+    // N cord update
+    threshold = lambdas[i];
+    int maxUpdateCord = MAXUPDATECORDNUM;
+    int numUpdateCord = 0;
+    std::priority_queue<std::pair<double, int>,
+           std::vector<std::pair<double, int> >,
+           CompareByFirst> max_temp_pq;
+    for (int k = 0; k < d; k++){
+      stage_lambdas[k] = lambdas[i];
+      if (grad[k] > threshold) {
+           numUpdateCord++;
+           max_temp_pq.push(std::make_pair(grad[k], k));
+           if(numUpdateCord>maxUpdateCord) max_temp_pq.pop();
+      }
+    }
+    Rprintf("LaLaLa size of new active set: %d\n", max_temp_pq.size());
+    while(! max_temp_pq.empty())
+    {
+      std::pair<double, int> pair_temp = max_temp_pq.top();
+      max_temp_pq.pop();
+      actset_indcat[pair_temp.second] = true;
+    }
+
 
     m_obj->update_auxiliary();
     // loop level 0: multistage convex relaxation
@@ -167,16 +282,16 @@ void ActNewtonSolver::solve() {
 
         // check stopping criterion 2: active set change
         // Multi Update
-        bool new_active_idx = false;
-        for (int k = 0; k < d; k++)
-          if (actset_indcat[k] == 0) {
-            m_obj->update_gradient(k);
-            grad[k] = fabs(m_obj->get_grad(k));
-            if (grad[k] > stage_lambdas[k]) {
-              actset_indcat[k] = 1;
-              new_active_idx = true;
-            }
-          }
+        // bool new_active_idx = false;
+        // for (int k = 0; k < d; k++)
+        //   if (actset_indcat[k] == 0) {
+        //     m_obj->update_gradient(k);
+        //     grad[k] = fabs(m_obj->get_grad(k));
+        //     if (grad[k] > stage_lambdas[k]) {
+        //       actset_indcat[k] = 1;
+        //       new_active_idx = true;
+        //     }
+        //   }
 
         //Single Update
         // double max_temp = -1;
@@ -195,6 +310,34 @@ void ActNewtonSolver::solve() {
         //   }
         // if(max_temp_id != -1)
         //   actset_indcat[max_temp_id] = true;
+
+        // N cord update
+        int maxUpdateCord = MAXUPDATECORDNUM;
+        int numUpdateCord = 0;
+        std::priority_queue<std::pair<double, int>,
+               std::vector<std::pair<double, int> >,
+               CompareByFirst> max_temp_pq;
+        bool new_active_idx = false;
+        for (int k = 0; k < d; k++)
+          if (actset_indcat[k] == 0) {
+             m_obj->update_gradient(k);
+             grad[k] = fabs(m_obj->get_grad(k));
+             // if (grad[k] > stage_lambdas[k]){
+             if (grad[k] > lambdas[i]){
+               numUpdateCord++;
+               max_temp_pq.push(std::make_pair(grad[k], k));
+               if(numUpdateCord>maxUpdateCord) max_temp_pq.pop();
+             }
+           }
+        new_active_idx = numUpdateCord>0;
+        Rprintf("size of new active set: %d\n", max_temp_pq.size());
+        while(! max_temp_pq.empty())
+        {
+          std::pair<double, int> pair_temp = max_temp_pq.top();
+          max_temp_pq.pop();
+          actset_indcat[pair_temp.second] = true;
+          Rprintf("%d\n",pair_temp.second);
+        }
 
         if (!new_active_idx) break;
       }
@@ -248,6 +391,8 @@ void ActNewtonSolver::solve() {
 
   delete regfunc;
 }  // namespace solver
+
+
 
 }  // namespace solver
 }  // namespace picasso

@@ -169,6 +169,7 @@ class ObjFunction {
 
   // coordinate descent
   virtual double coordinate_descent(RegFunction *regfun, int idx) = 0;
+  virtual double coordinate_descent_l1(double lambda, int idx){};
 
   // update intercept term
   virtual void intercept_update() = 0;
@@ -183,6 +184,8 @@ class ObjFunction {
 
   // unpenalized function value
   virtual double eval() = 0;
+  virtual double kkt_val(double lambda) {return 0;};
+  virtual double kkt_val_act(double lambda, std::vector<bool> &actset_is) {return 0;}; // on active set
 
   virtual ~ObjFunction(){};
 };
@@ -209,10 +212,15 @@ class GLMObjective : public ObjFunction {
                bool include_intercept);
 
   double coordinate_descent(RegFunction *regfunc, int idx);
+  double coordinate_descent_l1(double lambda, int idx);
 
   void intercept_update();
   void update_auxiliary();
   void update_gradient(int);
+
+  // kkt value
+  double kkt_val(double lambda) override;
+  double kkt_val_act(double lambda, std::vector<bool> &actset_is) override; // on active set
 
   double get_local_change(double old, int idx);
 };

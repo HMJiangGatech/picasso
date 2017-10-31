@@ -21,6 +21,7 @@ class ActNewtonSolver {
   ActNewtonSolver(ObjFunction *obj, PicassoSolverParams param);
 
   void solve();
+  void solve_lasso();
 
   const std::vector<int> &get_itercnt_path() const { return itercnt_path; };
   const ModelParam &get_model_param(int i) const { return solution_path[i]; };

@@ -68,6 +68,49 @@ double GLMObjective::coordinate_descent(RegFunction *regfunc, int idx) {
   return (model_param.beta[idx]);
 }
 
+double GLMObjective::coordinate_descent_l1(double lambda, int idx) {
+  g = 0.0;
+  a = 0.0;
+
+  double tmp;
+  // g = (<wXX, model_param.beta> + <r, X>)/n
+  // a = sum(wXX)/n
+  for (int i = 0; i < n; i++) {
+    tmp = w[i] * X[idx][i] * X[idx][i];
+    g += tmp * model_param.beta[idx] + r[i] * X[idx][i];
+    a += tmp;
+  }
+  g = g / n;
+  a = a / n;
+
+  tmp = model_param.beta[idx];
+
+  // soft threshold
+  {
+    if (g > lambda)
+      g = g - lambda;
+    else if (g < -lambda)
+      g = g + lambda;
+    else
+      g = 0;
+  }
+
+  model_param.beta[idx] = g / a;
+
+  tmp = model_param.beta[idx] - tmp;
+  if (fabs(tmp) > 1e-8) {
+    // Xb += delta*X[idx*n]
+    for (int i = 0; i < n; i++) Xb[i] = Xb[i] + tmp * X[idx][i];
+    // sum_r = 0.0;
+    // r -= delta*w*X
+    for (int i = 0; i < n; i++) {
+      r[i] = r[i] - w[i] * X[idx][i] * tmp;
+      // sum_r += r[i];
+    }
+  }
+  return (model_param.beta[idx]);
+}
+
 void GLMObjective::intercept_update() {
   sum_r = 0.0;
   for (int i = 0; i < n; i++) sum_r += r[i];
@@ -250,6 +293,47 @@ double GaussianObjective::eval() {
   }
   v = v / n;
   return v;
+}
+
+
+
+double GLMObjective::kkt_val(double lambda) {
+  double grad_max = 0;
+  for (int i = 0; i < d; i++){
+    double grad = gr[i];
+    if (model_param.beta[i] == 0 && fabs(grad)<lambda){
+        grad = 0;
+    } else {
+      if (model_param.beta[i] > 0)
+        grad = grad + lambda;
+      else
+        grad = grad - lambda;
+    }
+    grad = fabs(grad);
+    if (grad > grad_max)
+      grad_max = grad;
+  }
+  return(grad_max);
+}
+
+double GLMObjective::kkt_val_act(double lambda, std::vector<bool> &actset_is) {
+  double grad_max = 0;
+  for (int i = 0; i < d; i++)
+    if (actset_is[i]){
+      double grad = gr[i];
+      if (model_param.beta[i] == 0 && fabs(grad)<lambda){
+          grad = 0;
+      } else {
+        if (model_param.beta[i] > 0)
+          grad = grad + lambda;
+        else
+          grad = grad - lambda;
+      }
+      grad = fabs(grad);
+      if (grad > grad_max)
+        grad_max = grad;
+    }
+  return(grad_max);
 }
 
 
