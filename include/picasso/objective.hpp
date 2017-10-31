@@ -169,7 +169,7 @@ class ObjFunction {
 
   // coordinate descent
   virtual double coordinate_descent(RegFunction *regfun, int idx) = 0;
-  virtual double coordinate_descent_l1(double lambda, int idx){};
+  virtual double coordinate_descent_l1_newton(double lambda, int idx){return -1;};
 
   // update intercept term
   virtual void intercept_update() = 0;
@@ -212,7 +212,7 @@ class GLMObjective : public ObjFunction {
                bool include_intercept);
 
   double coordinate_descent(RegFunction *regfunc, int idx);
-  double coordinate_descent_l1(double lambda, int idx);
+  double coordinate_descent_l1_newton(double lambda, int idx);
 
   void intercept_update();
   void update_auxiliary();

@@ -32,72 +32,89 @@ void ActNewtonSolver::solve_lasso() {
   std::vector<bool> actset_is(d, 0);
   std::vector<int> actset_idx;
 
-  RegFunction *regfunc = new RegL1();
-
-  double zeta = 0;
+  double zeta = 0.05;
   double delta = m_param.prec;
 
   // Loop for lambdas
   for (int lambda_id = 0; lambda_id < lambdas.size(); lambda_id++){
-    double lambda = lambdas[lambda_id];
-
-    // Initialize active set
-    for (int  i = 0; i < d; i++) {
-      if (m_obj->get_model_coef(i) != 0)
-        actset_is[i] = true;
-      else if (fabs(m_obj->get_grad(i))>=(1-zeta)*lambda)
-        actset_is[i] = true;
-    }
-
-    int outer_loop_id = 0;
-    // Outer Loop: Multistage Convex Relaxation
-    while (m_obj->kkt_val(lambda)>m_param.prec*lambda){
-      outer_loop_id++;
-      Rprintf("outer_loop_id:%d\n",outer_loop_id );
-
-      // initialize actset_idx
-      actset_idx.clear();
-      for (int j = 0; j < d; j++)
-        if (actset_is[j])
-          actset_idx.push_back(j);
-
-      int inner_loop_id = 0;
-      // Inner Loop: Proximal Newton on Active Set
-      while (m_obj->kkt_val_act(lambda, actset_is)>m_param.prec*lambda){
-        inner_loop_id++;
-        Rprintf("\tinner_loop_id:%d, kkt:%lf, stopping c: %lf\n",inner_loop_id,m_obj->kkt_val_act(lambda, actset_is) , m_param.prec*lambda);
-        // update coordinate
-        for (int k = 0; k < actset_idx.size(); k++) {
-          int idx = actset_idx[k];
-          m_obj->coordinate_descent_l1(lambda, idx);
-        }
-
-        // update intercept
-        if (m_param.include_intercept)
-          m_obj->intercept_update();
-          
-        m_obj->update_auxiliary();
-        m_obj->update_key_aux();
-        for (int i = 0; i < d; i++) m_obj->update_gradient(i);
-        if(inner_loop_id>10) break;
-      } // Inner Loop
-
-
-      // Update active set
-      for (int  i = 0; i < d; i++) {
-        if (m_obj->get_model_coef(i) != 0)
-          actset_is[i] = true;
-        else if (fabs(m_obj->get_grad(i))>=(1-zeta)*lambda)
-          actset_is[i] = true;
-      }
-
-      if(outer_loop_id>10) break;
-    } // Outer Loop
-
-    // save the solution_path for each lambda
-    solution_path.push_back(m_obj->get_model_param());
+    Rprintf("lambda_id:%d\n",lambda_id);
+//     double lambda = lambdas[lambda_id];
+//
+//     // Initialize active set
+//     for (int  i = 0; i < d; i++) {
+//       if (m_obj->get_model_coef(i) != 0)
+//         actset_is[i] = true;
+//       else if (fabs(m_obj->get_grad(i))>=(1-zeta)*lambda)
+//         actset_is[i] = true;
+//       else
+//         actset_is[i] = false;
+//     }
+//
+//     int outer_loop_id = 0;
+//     // Outer Loop: Multistage Convex Relaxation
+//     while (m_obj->kkt_val(lambda)>m_param.prec*lambda){
+//       outer_loop_id++;
+//       Rprintf("\touter_loop_id:%d\n",outer_loop_id );
+//
+//       // initialize actset_idx for faster processing
+//       actset_idx.clear();
+//       for (int j = 0; j < d; j++)
+//         if (actset_is[j])
+//           actset_idx.push_back(j);
+//
+//       int inner_loop_id = 0;
+//       // Inner Loop: Proximal Newton on Active Set
+//       while (m_obj->kkt_val_act(lambda, actset_is)>m_param.prec*lambda){
+//         inner_loop_id++;
+//         bool terminate_inner_loop = true;
+//         Rprintf("\t\tinner_loop_id:%d, kkt:%lf, stopping c: %lf\n",inner_loop_id,m_obj->kkt_val_act(lambda, actset_is) , m_param.prec*lambda);
+//         // update coordinate
+//         for (int k = 0; k < actset_idx.size(); k++) {
+//           int idx = actset_idx[k];
+//           auto old_beta = m_obj->get_model_coef(idx);
+//
+//           m_obj->coordinate_descent_l1_newton(lambda, idx);
+//           if (m_obj->get_local_change(old_beta, idx) > m_param.prec)
+//             terminate_inner_loop = false;
+//         }
+//
+//         // update intercept
+//         if (m_param.include_intercept)
+//         {
+//             auto old_intcpt = m_obj->get_model_coef(-1);
+//             m_obj->intercept_update();
+//             if (m_obj->get_local_change(old_intcpt, -1) > m_param.prec)
+//               terminate_inner_loop = false;
+//         }
+//
+//         m_obj->update_auxiliary();
+//         for (int i = 0; i < d; i++) m_obj->update_gradient(i);
+//         if(inner_loop_id>m_param.max_iter || terminate_inner_loop) break;
+//       } // Inner Loop
+//
+//
+//       // Update active set
+//       bool actset_updated = false;
+//       for (int  i = 0; i < d; i++) {
+//         bool oldact_is;
+//         oldact_is = actset_is[i];
+//         if (m_obj->get_model_coef(i) != 0)
+//           actset_is[i] = true;
+//         else if (fabs(m_obj->get_grad(i))>=(1-zeta)*lambda)
+//           actset_is[i] = true;
+//         else
+//           actset_is[i] = false;
+//         actset_updated = actset_updated||(oldact_is^actset_is[i]);
+//       }
+// Rprintf("Update active set!\n");
+//
+//       if(outer_loop_id>m_param.max_iter || !(actset_updated)) break;
+//     } // Outer Loop
+//
+//     // save the solution_path for each lambda
+     solution_path.push_back(m_obj->get_model_param());
   } // Loop for lambdas
-
+  Rprintf("Training is over! solution_path.size:%d \n", solution_path.size());
 
 }
 
@@ -191,7 +208,7 @@ void ActNewtonSolver::solve() {
            if(numUpdateCord>maxUpdateCord) max_temp_pq.pop();
       }
     }
-    Rprintf("LaLaLa size of new active set: %d\n", max_temp_pq.size());
+    //Rprintf("LaLaLa size of new active set: %d\n", max_temp_pq.size());
     while(! max_temp_pq.empty())
     {
       std::pair<double, int> pair_temp = max_temp_pq.top();
@@ -330,7 +347,7 @@ void ActNewtonSolver::solve() {
              }
            }
         new_active_idx = numUpdateCord>0;
-        Rprintf("size of new active set: %d\n", max_temp_pq.size());
+        //Rprintf("size of new active set: %d\n", max_temp_pq.size());
         while(! max_temp_pq.empty())
         {
           std::pair<double, int> pair_temp = max_temp_pq.top();

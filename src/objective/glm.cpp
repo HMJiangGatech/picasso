@@ -1,5 +1,5 @@
 #include <picasso/objective.hpp>
-// #include <R.h>
+#include <R.h>
 
 namespace picasso {
 GLMObjective::GLMObjective(const double *xmat, const double *y, int n, int d)
@@ -26,14 +26,6 @@ GLMObjective::GLMObjective(const double *xmat, const double *y, int n, int d,
 
   wXX.resize(d);
 
-  if (include_intercept) {
-    double avr_y = 0.0;
-    for (int i = 0; i < n; i++) {
-      avr_y += Y[i];
-    }
-    avr_y = avr_y / n;
-    model_param.intercept = log(avr_y / (1 - avr_y));
-  }
 }
 
 double GLMObjective::coordinate_descent(RegFunction *regfunc, int idx) {
@@ -68,7 +60,7 @@ double GLMObjective::coordinate_descent(RegFunction *regfunc, int idx) {
   return (model_param.beta[idx]);
 }
 
-double GLMObjective::coordinate_descent_l1(double lambda, int idx) {
+double GLMObjective::coordinate_descent_l1_newton(double lambda, int idx) {
   g = 0.0;
   a = 0.0;
 
@@ -98,6 +90,7 @@ double GLMObjective::coordinate_descent_l1(double lambda, int idx) {
   model_param.beta[idx] = g / a;
 
   tmp = model_param.beta[idx] - tmp;
+  // Rprintf("\t tmp: %lf\n", tmp);
   if (fabs(tmp) > 1e-8) {
     // Xb += delta*X[idx*n]
     for (int i = 0; i < n; i++) Xb[i] = Xb[i] + tmp * X[idx][i];
@@ -189,7 +182,7 @@ LogisticObjective::LogisticObjective(const double *xmat, const double *y, int n,
   update_auxiliary();
   for (int i = 0; i < d; i++) update_gradient(i);
 
-  update_auxiliary();
+  // update_auxiliary(); (delete by haoming)
 
   deviance = fabs(eval());
 };
@@ -230,7 +223,7 @@ PoissonObjective::PoissonObjective(const double *xmat, const double *y, int n,
   update_auxiliary();
   for (int i = 0; i < d; i++) update_gradient(i);
 
-  update_auxiliary();
+  // update_auxiliary(); (delete by haoming)
 
   deviance = fabs(eval());
 };
@@ -271,7 +264,7 @@ GaussianObjective::GaussianObjective(const double *xmat, const double *y, int n,
   update_auxiliary();
   for (int i = 0; i < d; i++) update_gradient(i);
 
-  update_auxiliary();
+  // update_auxiliary(); (delete by haoming)
 
   deviance = fabs(eval());
 };

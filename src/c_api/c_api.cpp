@@ -48,18 +48,18 @@ Rprintf("-------------------picasso_actnewton_solver\n");
 
   const std::vector<int> &itercnt_path = actnewton_solver.get_itercnt_path();
 
-  for (int i = 0; i < nlambda; i++) {
-    const picasso::ModelParam &model_param =
-        actnewton_solver.get_model_param(i);
-    ite_lamb[i] = itercnt_path[i];
-    size_act[i] = 0;
-    for (int j = 0; j < d; j++) {
-      beta[i * d + j] = model_param.beta[j];
-      if (fabs(beta[i * d + j]) > 1e-8) size_act[i]++;
-    }
-    intcpt[i] = model_param.intercept;
-    runt[i] = 0.0;
-  }
+  // for (int i = 0; i < nlambda; i++) {
+  //   const picasso::ModelParam &model_param =
+  //       actnewton_solver.get_model_param(i);
+  //   ite_lamb[i] = itercnt_path[i];
+  //   size_act[i] = 0;
+  //   for (int j = 0; j < d; j++) {
+  //     beta[i * d + j] = model_param.beta[j];
+  //     if (fabs(beta[i * d + j]) > 1e-8) size_act[i]++;
+  //   }
+  //   intcpt[i] = model_param.intercept;
+  //   runt[i] = 0.0;
+  // }
 }
 
 void picasso_actgd_solver(
