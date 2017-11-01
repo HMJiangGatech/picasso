@@ -4,7 +4,7 @@
 #include <picasso/solver_params.hpp>
 
 #include <queue>
-#define MAXUPDATECORDNUM 10000
+#define MAXUPDATECORDNUM 10001
 
 #include <R.h>
 
@@ -38,14 +38,14 @@ void ActNewtonSolver::solve_lasso() {
 
   // Loop for lambdas
   for (int lambda_id = 0; lambda_id < lambdas.size(); lambda_id++){
-    Rprintf("lambda_id:%d\n",lambda_id);
+    //Rprintf("lambda_id:%d\n",lambda_id);
     double lambda = lambdas[lambda_id];
 
     // Initialize active set
     for (int  i = 0; i < d; i++) {
         actset_is[i] = m_obj->get_model_coef(i) != 0;
     }
-    int maxUpdateCord = MAXUPDATECORDNUM;
+    int maxUpdateCord =         MAXUPDATECORDNUM;
     int numUpdateCord = 0;
     std::priority_queue<std::pair<double, int>,
           std::vector<std::pair<double, int> >,
@@ -59,7 +59,7 @@ void ActNewtonSolver::solve_lasso() {
               if(numUpdateCord>maxUpdateCord) max_temp_pq.pop();
           }
       }
-    Rprintf("LaLaLa size of new active set: %d\n", max_temp_pq.size());
+    //Rprintf("LaLaLa size of new active set: %d\n", max_temp_pq.size());
     while(! max_temp_pq.empty())
     {
       std::pair<double, int> pair_temp = max_temp_pq.top();
@@ -71,7 +71,7 @@ void ActNewtonSolver::solve_lasso() {
     // Outer Loop: Multistage Convex Relaxation
     while (m_obj->kkt_val(lambda)>delta*lambda){
       outer_loop_id++;
-      Rprintf("\touter_loop_id:%d\n",outer_loop_id );
+      //Rprintf("\touter_loop_id:%d\n",outer_loop_id );
 
       // initialize actset_idx for faster processing
       actset_idx.clear();
@@ -84,7 +84,7 @@ void ActNewtonSolver::solve_lasso() {
       while (m_obj->kkt_val_act(lambda, actset_is)>delta*lambda){
         inner_loop_id++;
         bool terminate_inner_loop = true;
-        Rprintf("\t\tinner_loop_id:%d, kkt:%lf, stopping c: %lf\n",inner_loop_id,m_obj->kkt_val_act(lambda, actset_is) , m_param.prec*lambda);
+        //Rprintf("\t\tinner_loop_id:%d, kkt:%lf, stopping c: %lf\n",inner_loop_id,m_obj->kkt_val_act(lambda, actset_is) , m_param.prec*lambda);
         // update coordinate
         for (int k = 0; k < actset_idx.size(); k++) {
           int idx = actset_idx[k];
@@ -109,6 +109,8 @@ void ActNewtonSolver::solve_lasso() {
         if(inner_loop_id>m_param.max_iter || terminate_inner_loop) break;
       } // Inner Loop
 
+      m_obj->update_auxiliary();
+
       // track the number of iterations for each lambda
       itercnt_path[lambda_id] += inner_loop_id;
 
@@ -132,7 +134,7 @@ void ActNewtonSolver::solve_lasso() {
               }
           }
       new_active_idx = numUpdateCord>0;
-      Rprintf("size of new active set: %d\n", max_temp_pq.size());
+      //Rprintf("size of new active set: %d\n", max_temp_pq.size());
       while(! max_temp_pq.empty())
       {
           std::pair<double, int> pair_temp = max_temp_pq.top();
