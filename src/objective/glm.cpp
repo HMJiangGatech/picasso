@@ -1,5 +1,5 @@
 #include <picasso/objective.hpp>
-#include <R.h>
+// #include <R.h>
 
 namespace picasso {
 GLMObjective::GLMObjective(const double *xmat, const double *y, int n, int d)
@@ -148,7 +148,7 @@ void GLMObjective::update_auxiliary() {
 
 void GLMObjective::update_gradient(int idx) {
   gr[idx] = 0.0;
-  for (int i = 0; i < n; i++) gr[idx] += (Y[i] - p[i]) * X[idx][i] / n;
+  for (int i = 0; i < n; i++) gr[idx] += r[i] * X[idx][i] / n;
   // if(idx==5) Rprintf("grad[j] = %lf; Y[5] = %lf; p[5] = %lf; X[idx][5] = %lf; n = %d; \n",gr[idx], Y[5], p[5], X[idx][5], n);
 }
 
