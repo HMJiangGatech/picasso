@@ -33,15 +33,30 @@ double GLMObjective::coordinate_descent(RegFunction *regfunc, int idx) {
   a = 0.0;
 
   double tmp;
-  // g = (<wXX, model_param.beta> + <r, X>)/n
-  // a = sum(wXX)/n
-  for (int i = 0; i < n; i++) {
+
+  static int subsampleidx = 0;
+  int subsample_portion = 1;
+  subsampleidx++;
+  subsampleidx = subsampleidx%subsample_portion;
+  // Sub hessian
+  for (int i = (n*subsampleidx)/subsample_portion; i < (n*subsampleidx+n)/subsample_portion; i++) {
     tmp = w[i] * X[idx][i] * X[idx][i];
     g += tmp * model_param.beta[idx] + r[i] * X[idx][i];
     a += tmp;
   }
-  g = g / n;
-  a = a / n;
+  g = g / n * subsample_portion;
+  a = a / n * subsample_portion;
+
+  // g = (<wXX, model_param.beta> + <r, X>)/n
+  // a = sum(wXX)/n
+  // Full hessian
+  // for (int i = 0; i < n; i++) {
+  //   tmp = w[i] * X[idx][i] * X[idx][i];
+  //   g += tmp * model_param.beta[idx] + r[i] * X[idx][i];
+  //   a += tmp;
+  // }
+  // g = g / n;
+  // a = a / n;
 
   tmp = model_param.beta[idx];
   model_param.beta[idx] = regfunc->threshold(g) / a;

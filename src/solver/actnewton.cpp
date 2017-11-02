@@ -4,7 +4,7 @@
 #include <picasso/solver_params.hpp>
 
 #include <queue>
-#define MAXUPDATECORDNUM 10001
+#define MAXUPDATECORDNUM 60
 
 #include <R.h>
 
@@ -38,7 +38,7 @@ void ActNewtonSolver::solve_lasso() {
 
   // Loop for lambdas
   for (int lambda_id = 0; lambda_id < lambdas.size(); lambda_id++){
-    //Rprintf("lambda_id:%d\n",lambda_id);
+    ////Rprintf("lambda_id:%d\n",lambda_id);
     double lambda = lambdas[lambda_id];
 
     // Initialize active set
@@ -59,7 +59,7 @@ void ActNewtonSolver::solve_lasso() {
               if(numUpdateCord>maxUpdateCord) max_temp_pq.pop();
           }
       }
-    //Rprintf("LaLaLa size of new active set: %d\n", max_temp_pq.size());
+    ////Rprintf("LaLaLa size of new active set: %d\n", max_temp_pq.size());
     while(! max_temp_pq.empty())
     {
       std::pair<double, int> pair_temp = max_temp_pq.top();
@@ -71,7 +71,7 @@ void ActNewtonSolver::solve_lasso() {
     // Outer Loop: Multistage Convex Relaxation
     while (m_obj->kkt_val(lambda)>delta*lambda){
       outer_loop_id++;
-      //Rprintf("\touter_loop_id:%d\n",outer_loop_id );
+      ////Rprintf("\touter_loop_id:%d\n",outer_loop_id );
 
       // initialize actset_idx for faster processing
       actset_idx.clear();
@@ -84,7 +84,7 @@ void ActNewtonSolver::solve_lasso() {
       while (m_obj->kkt_val_act(lambda, actset_is)>delta*lambda){
         inner_loop_id++;
         bool terminate_inner_loop = true;
-        //Rprintf("\t\tinner_loop_id:%d, kkt:%lf, stopping c: %lf\n",inner_loop_id,m_obj->kkt_val_act(lambda, actset_is) , m_param.prec*lambda);
+        ////Rprintf("\t\tinner_loop_id:%d, kkt:%lf, stopping c: %lf\n",inner_loop_id,m_obj->kkt_val_act(lambda, actset_is) , m_param.prec*lambda);
         // update coordinate
         for (int k = 0; k < actset_idx.size(); k++) {
           int idx = actset_idx[k];
@@ -134,13 +134,13 @@ void ActNewtonSolver::solve_lasso() {
               }
           }
       new_active_idx = numUpdateCord>0;
-      //Rprintf("size of new active set: %d\n", max_temp_pq.size());
+      ////Rprintf("size of new active set: %d\n", max_temp_pq.size());
       while(! max_temp_pq.empty())
       {
           std::pair<double, int> pair_temp = max_temp_pq.top();
           max_temp_pq.pop();
           actset_is[pair_temp.second] = true;
-          // Rprintf("%d\n",pair_temp.second);
+          // //Rprintf("%d\n",pair_temp.second);
       }
 
       if(outer_loop_id>m_param.max_iter/100 || !(new_active_idx)) break;
@@ -149,7 +149,7 @@ void ActNewtonSolver::solve_lasso() {
     // save the solution_path for each lambda
      solution_path.push_back(m_obj->get_model_param());
   } // Loop for lambdas
-  // Rprintf("Training is over! solution_path.size:%d \n", solution_path.size());
+  // //Rprintf("Training is over! solution_path.size:%d \n", solution_path.size());
 
 }
 
@@ -160,7 +160,7 @@ void ActNewtonSolver::solve() {
   const std::vector<double> &lambdas = m_param.get_lambda_path();
   itercnt_path.resize(lambdas.size(), 0);
 
-  double dev_thr = m_param.prec;
+  double dev_thr = m_param.prec*m_obj->get_deviance();
 
   // actset_indcat[i] == 1 if i is in the active set
   std::vector<int> actset_indcat(d, 0);
@@ -172,12 +172,12 @@ void ActNewtonSolver::solve() {
   std::vector<double> grad(d);
 
   for (int i = 0; i < d; i++) {grad[i] = fabs(m_obj->get_grad(i));
-    // Rprintf("grad[j] = %lf \n",grad[i]);
+    // //Rprintf("grad[j] = %lf \n",grad[i]);
   }
 
   RegFunction *regfunc = new RegL1();
   for (int i = 0; i < lambdas.size(); i++) {
-    // Rprintf("lambda[%d]:%f\n", i, lambdas[i]);
+    // //Rprintf("lambda[%d]:%f\n", i, lambdas[i]);
 
     // Initialize active set
     for (int  j = 0; j < d; j++) {
@@ -224,7 +224,7 @@ void ActNewtonSolver::solve() {
            if(numUpdateCord>maxUpdateCord) max_temp_pq.pop();
       }
     }
-    Rprintf("LaLaLa size of new active set: %d\n", max_temp_pq.size());
+    //Rprintf("LaLaLa size of new active set: %d\n", max_temp_pq.size());
     while(! max_temp_pq.empty())
     {
       std::pair<double, int> pair_temp = max_temp_pq.top();
@@ -240,14 +240,14 @@ void ActNewtonSolver::solve() {
     double old_beta, old_intcpt, updated_coord, beta;
     while (loopcnt_level_0 < m_param.num_relaxation_round) {
       loopcnt_level_0++;
-      Rprintf("loopcnt_level_0 = %d\n",loopcnt_level_0);
+      //Rprintf("loopcnt_level_0 = %d\n",loopcnt_level_0);
 
       // loop level 1: active set update
       int loopcnt_level_1 = 0;
       bool terminate_loop_level_1 = true;
       while (loopcnt_level_1 < m_param.max_iter) {
         loopcnt_level_1++;
-        Rprintf("\t loopcnt_level_1 = %d\n",loopcnt_level_1);
+        //Rprintf("\t loopcnt_level_1 = %d\n",loopcnt_level_1);
         terminate_loop_level_1 = true;
 
         old_intcpt = m_obj->get_model_coef(-1);
@@ -259,7 +259,7 @@ void ActNewtonSolver::solve() {
           if (actset_indcat[j]) {
             regfunc->set_param(lambdas[i], 0.0);
             updated_coord = m_obj->coordinate_descent(regfunc, j);
-            // Rprintf("\t updated_coord: %lf",updated_coord);
+            // //Rprintf("\t updated_coord: %lf",updated_coord);
             if (fabs(updated_coord) > 0) actset_idx.push_back(j);
           }
 
@@ -268,7 +268,7 @@ void ActNewtonSolver::solve() {
         bool terminate_loop_level_2 = true;
         while (loopcnt_level_2 < m_param.max_iter) {
           loopcnt_level_2++;
-          Rprintf("\t\t loopcnt_level_2 = %d; actset_idx.size: %d\n",loopcnt_level_2, actset_idx.size());
+          //Rprintf("\t\t loopcnt_level_2 = %d; actset_idx.size: %d\n",loopcnt_level_2, actset_idx.size());
           terminate_loop_level_2 = true;
 
           for (int k = 0; k < actset_idx.size(); k++) {
@@ -293,7 +293,7 @@ void ActNewtonSolver::solve() {
 
           if (terminate_loop_level_2) break;
         }
-        // Rprintf("---------loopcnt cnt level 2:%d\n", loopcnt_level_2);
+        // //Rprintf("---------loopcnt cnt level 2:%d\n", loopcnt_level_2);
 
         itercnt_path[i] += loopcnt_level_2;
 
@@ -368,19 +368,19 @@ void ActNewtonSolver::solve() {
              }
            }
         new_active_idx = numUpdateCord>0;
-        Rprintf("size of new active set: %d\n", max_temp_pq.size());
+        //Rprintf("size of new active set: %d\n", max_temp_pq.size());
         while(! max_temp_pq.empty())
         {
           std::pair<double, int> pair_temp = max_temp_pq.top();
           max_temp_pq.pop();
           actset_indcat[pair_temp.second] = true;
-          // Rprintf("%d\n",pair_temp.second);
+          // //Rprintf("%d\n",pair_temp.second);
         }
 
         if (!new_active_idx) break;
       }
 
-      // Rprintf("---loop level 1 cnt:%d\n", loopcnt_level_1);
+      // //Rprintf("---loop level 1 cnt:%d\n", loopcnt_level_1);
 
       if (m_param.reg_type == L1) break;
 
