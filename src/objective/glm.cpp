@@ -35,7 +35,7 @@ double GLMObjective::coordinate_descent(RegFunction *regfunc, int idx) {
   double tmp;
 
   static int subsampleidx = 0;
-  int subsample_portion = 250;
+  int subsample_portion = 40;
   subsampleidx = 37*subsampleidx+2;
   subsampleidx = subsampleidx%subsample_portion;
   // Sub hessian
