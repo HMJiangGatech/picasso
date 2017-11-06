@@ -34,6 +34,7 @@ double GLMObjective::coordinate_descent(RegFunction *regfunc, int idx) {
 
   double tmp;
 
+<<<<<<< HEAD
   static int g_subsampleidx = 0;
   int subsample_portion = 30;
   g_subsampleidx++;
@@ -42,17 +43,34 @@ double GLMObjective::coordinate_descent(RegFunction *regfunc, int idx) {
   int id2 = (n*subsampleidx+n)/subsample_portion;
   // Sub hessian
   for (int i = 0; i < id1; i++) {
+=======
+  static int subsampleidx = 0;
+  int subsample_portion = 40;
+  subsampleidx = 37*subsampleidx+2;
+  subsampleidx = subsampleidx%subsample_portion;
+  // Sub hessian
+  for (int i = 0; i < (n*subsampleidx)/subsample_portion; i++) {
+>>>>>>> 63c9c901997a4c292871a9af1b312b389a213974
     tmp = w[i] * X[idx][i] * X[idx][i];
     g += tmp * model_param.beta[idx] + r[i] * X[idx][i];
     a += tmp;
   }
+<<<<<<< HEAD
   for (int i = id2; i < n; i++) {
+=======
+  for (int i = (n*subsampleidx+n)/subsample_portion; i < n; i++) {
+>>>>>>> 63c9c901997a4c292871a9af1b312b389a213974
     tmp = w[i] * X[idx][i] * X[idx][i];
     g += tmp * model_param.beta[idx] + r[i] * X[idx][i];
     a += tmp;
   }
+<<<<<<< HEAD
   g = g / n * subsample_portion / (subsample_portion-1);
   a = a / n * subsample_portion / (subsample_portion-1);
+=======
+  g = g / n * subsample_portion/(subsample_portion-1);
+  a = a / n * subsample_portion/(subsample_portion-1);
+>>>>>>> 63c9c901997a4c292871a9af1b312b389a213974
 
   // g = (<wXX, model_param.beta> + <r, X>)/n
   // a = sum(wXX)/n
