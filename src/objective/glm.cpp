@@ -34,18 +34,25 @@ double GLMObjective::coordinate_descent(RegFunction *regfunc, int idx) {
 
   double tmp;
 
-  static int subsampleidx = 0;
-  int subsample_portion = 1;
-  subsampleidx++;
-  subsampleidx = subsampleidx%subsample_portion;
+  static int g_subsampleidx = 0;
+  int subsample_portion = 30;
+  g_subsampleidx++;
+  int subsampleidx = (g_subsampleidx%5)%subsample_portion;
+  int id1 = (n*subsampleidx)/subsample_portion;
+  int id2 = (n*subsampleidx+n)/subsample_portion;
   // Sub hessian
-  for (int i = (n*subsampleidx)/subsample_portion; i < (n*subsampleidx+n)/subsample_portion; i++) {
+  for (int i = 0; i < id1; i++) {
     tmp = w[i] * X[idx][i] * X[idx][i];
     g += tmp * model_param.beta[idx] + r[i] * X[idx][i];
     a += tmp;
   }
-  g = g / n * subsample_portion;
-  a = a / n * subsample_portion;
+  for (int i = id2; i < n; i++) {
+    tmp = w[i] * X[idx][i] * X[idx][i];
+    g += tmp * model_param.beta[idx] + r[i] * X[idx][i];
+    a += tmp;
+  }
+  g = g / n * subsample_portion / (subsample_portion-1);
+  a = a / n * subsample_portion / (subsample_portion-1);
 
   // g = (<wXX, model_param.beta> + <r, X>)/n
   // a = sum(wXX)/n
