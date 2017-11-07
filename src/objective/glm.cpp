@@ -1,5 +1,8 @@
 #include <picasso/objective.hpp>
 // #include <R.h>
+#include <chrono>
+using namespace std;
+using namespace chrono;
 
 namespace picasso {
 GLMObjective::GLMObjective(const double *xmat, const double *y, int n, int d)
@@ -34,44 +37,15 @@ double GLMObjective::coordinate_descent(RegFunction *regfunc, int idx) {
 
   double tmp;
 
-<<<<<<< HEAD
   static int g_subsampleidx = 0;
-  int subsample_portion = 30;
+  int subsample_portion = 2;
   g_subsampleidx++;
-  int subsampleidx = (g_subsampleidx%5)%subsample_portion;
+  int subsampleidx = g_subsampleidx%subsample_portion;
   int id1 = (n*subsampleidx)/subsample_portion;
   int id2 = (n*subsampleidx+n)/subsample_portion;
-  // Sub hessian
-  for (int i = 0; i < id1; i++) {
-=======
-  static int subsampleidx = 0;
-  int subsample_portion = 40;
-  subsampleidx = 37*subsampleidx+2;
-  subsampleidx = subsampleidx%subsample_portion;
-  // Sub hessian
-  for (int i = 0; i < (n*subsampleidx)/subsample_portion; i++) {
->>>>>>> 63c9c901997a4c292871a9af1b312b389a213974
-    tmp = w[i] * X[idx][i] * X[idx][i];
-    g += tmp * model_param.beta[idx] + r[i] * X[idx][i];
-    a += tmp;
-  }
-<<<<<<< HEAD
-  for (int i = id2; i < n; i++) {
-=======
-  for (int i = (n*subsampleidx+n)/subsample_portion; i < n; i++) {
->>>>>>> 63c9c901997a4c292871a9af1b312b389a213974
-    tmp = w[i] * X[idx][i] * X[idx][i];
-    g += tmp * model_param.beta[idx] + r[i] * X[idx][i];
-    a += tmp;
-  }
-<<<<<<< HEAD
-  g = g / n * subsample_portion / (subsample_portion-1);
-  a = a / n * subsample_portion / (subsample_portion-1);
-=======
-  g = g / n * subsample_portion/(subsample_portion-1);
-  a = a / n * subsample_portion/(subsample_portion-1);
->>>>>>> 63c9c901997a4c292871a9af1b312b389a213974
 
+
+  auto start = system_clock::now();
   // g = (<wXX, model_param.beta> + <r, X>)/n
   // a = sum(wXX)/n
   // Full hessian
@@ -83,10 +57,25 @@ double GLMObjective::coordinate_descent(RegFunction *regfunc, int idx) {
   // g = g / n;
   // a = a / n;
 
+  // Sub hessian
+  for (int i = id1; i < id2; i++) {
+    tmp = w[i] * X[idx][i] * X[idx][i];
+    g += tmp * model_param.beta[idx] + r[i] * X[idx][i];
+    a += tmp;
+  }
+
+  g = g / n * subsample_portion;
+  a = a / n * subsample_portion;
+
+  auto end   = system_clock::now();
+  auto duration = duration_cast<microseconds>(end - start);
+  this->hessian_time += double(duration.count());
+
   tmp = model_param.beta[idx];
   model_param.beta[idx] = regfunc->threshold(g) / a;
 
   tmp = model_param.beta[idx] - tmp;
+
   if (fabs(tmp) > 1e-8) {
     // Xb += delta*X[idx*n]
     for (int i = 0; i < n; i++) Xb[i] = Xb[i] + tmp * X[idx][i];

@@ -114,7 +114,9 @@ class ObjFunction {
 
   double deviance;
 
+
  public:
+  double hessian_time;
   ObjFunction(const double *xmat, const double *y, int n, int d)
       : model_param(d) {
     this->d = d;
@@ -123,6 +125,7 @@ class ObjFunction {
     X.resize(d);
     gr.resize(d);
     Xb.resize(n, 0);
+    hessian_time = 0;
 
     for (int i = 0; i < n; i++) Y[i] = y[i];
 

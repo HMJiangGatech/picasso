@@ -7,6 +7,9 @@
 #define MAXUPDATECORDNUM 60
 
 #include <R.h>
+#include <chrono>
+using namespace std;
+using namespace chrono;
 
 namespace picasso {
 namespace solver {
@@ -154,13 +157,15 @@ void ActNewtonSolver::solve_lasso() {
 }
 
 void ActNewtonSolver::solve() {
+  auto start_time = system_clock::now();
+
   unsigned int d = m_obj->get_dim();
   unsigned int n = m_obj->get_sample_num();
 
   const std::vector<double> &lambdas = m_param.get_lambda_path();
   itercnt_path.resize(lambdas.size(), 0);
 
-  double dev_thr = m_param.prec*m_obj->get_deviance();
+  double dev_thr_final = m_param.prec*m_obj->get_deviance();
 
   // actset_indcat[i] == 1 if i is in the active set
   std::vector<int> actset_indcat(d, 0);
@@ -177,6 +182,13 @@ void ActNewtonSolver::solve() {
 
   RegFunction *regfunc = new RegL1();
   for (int i = 0; i < lambdas.size(); i++) {
+    // Initialize terminate condition
+    int max_iter_c = i==(lambdas.size()-1) ? m_param.max_iter:m_param.max_iter/10;
+    double dev_thr = i==(lambdas.size()-1) ? dev_thr_final:dev_thr_final*10;
+
+
+
+
     // //Rprintf("lambda[%d]:%f\n", i, lambdas[i]);
 
     // Initialize active set
@@ -245,7 +257,7 @@ void ActNewtonSolver::solve() {
       // loop level 1: active set update
       int loopcnt_level_1 = 0;
       bool terminate_loop_level_1 = true;
-      while (loopcnt_level_1 < m_param.max_iter) {
+      while (loopcnt_level_1 < max_iter_c) {
         loopcnt_level_1++;
         //Rprintf("\t loopcnt_level_1 = %d\n",loopcnt_level_1);
         terminate_loop_level_1 = true;
@@ -266,7 +278,7 @@ void ActNewtonSolver::solve() {
         // loop level 2: proximal newton on active set
         int loopcnt_level_2 = 0;
         bool terminate_loop_level_2 = true;
-        while (loopcnt_level_2 < m_param.max_iter) {
+        while (loopcnt_level_2 < max_iter_c) {
           loopcnt_level_2++;
           //Rprintf("\t\t loopcnt_level_2 = %d; actset_idx.size: %d\n",loopcnt_level_2, actset_idx.size());
           terminate_loop_level_2 = true;
@@ -391,6 +403,15 @@ void ActNewtonSolver::solve() {
     solution_path.push_back(m_obj->get_model_param());
   }
 
+  auto end_time = system_clock::now();
+  auto duration = duration_cast<microseconds>(end_time - start_time);
+  Rprintf("total hessian_time = %lf \n",m_obj->hessian_time * microseconds::period::num / microseconds::period::den );
+  Rprintf("total training_time = %lf \n",double(duration.count()) * microseconds::period::num / microseconds::period::den );
+  Rprintf("hessian_time/training_time = %lf \n",1.0* m_obj->hessian_time/duration.count() );
+  int total_iter_num = 0;
+  for (int i = 0; i < lambdas.size(); i++)
+    total_iter_num += itercnt_path[i];
+  Rprintf("total_iter_num = %d \n",total_iter_num);
   delete regfunc;
 }  // namespace solver
 
