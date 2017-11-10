@@ -4,7 +4,7 @@
 #include <picasso/solver_params.hpp>
 
 #include <queue>
-#define MAXUPDATECORDNUM 60
+#define MAXUPDATECORDNUM 1
 
 #include <R.h>
 #include <chrono>

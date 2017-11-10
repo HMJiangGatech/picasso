@@ -49,23 +49,23 @@ double GLMObjective::coordinate_descent(RegFunction *regfunc, int idx) {
   // g = (<wXX, model_param.beta> + <r, X>)/n
   // a = sum(wXX)/n
   // Full hessian
-  // for (int i = 0; i < n; i++) {
-  //   tmp = w[i] * X[idx][i] * X[idx][i];
-  //   g += tmp * model_param.beta[idx] + r[i] * X[idx][i];
-  //   a += tmp;
-  // }
-  // g = g / n;
-  // a = a / n;
-
-  // Sub hessian
-  for (int i = id1; i < id2; i++) {
+  for (int i = 0; i < n; i++) {
     tmp = w[i] * X[idx][i] * X[idx][i];
     g += tmp * model_param.beta[idx] + r[i] * X[idx][i];
     a += tmp;
   }
+  g = g / n;
+  a = a / n;
 
-  g = g / n * subsample_portion;
-  a = a / n * subsample_portion;
+  // Sub hessian
+  // for (int i = id1; i < id2; i++) {
+  //   tmp = w[i] * X[idx][i] * X[idx][i];
+  //   g += tmp * model_param.beta[idx] + r[i] * X[idx][i];
+  //   a += tmp;
+  // }
+  //
+  // g = g / n * subsample_portion;
+  // a = a / n * subsample_portion;
 
   auto end   = system_clock::now();
   auto duration = duration_cast<microseconds>(end - start);
