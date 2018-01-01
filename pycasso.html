@@ -8,7 +8,7 @@
   
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-  <title>pycasso package &mdash; pycasso 0.1.0. documentation</title>
+  <title>pycasso package &mdash; pycasso 0.1.1 documentation</title>
   
 
   
@@ -35,7 +35,7 @@
         <link rel="index" title="Index"
               href="genindex.html"/>
         <link rel="search" title="Search" href="search.html"/>
-    <link rel="top" title="pycasso 0.1.0. documentation" href="index.html"/>
+    <link rel="top" title="pycasso 0.1.1 documentation" href="index.html"/>
         <link rel="prev" title="Picasso Python Package" href="README.html"/> 
 
   
@@ -65,7 +65,7 @@
             
             
               <div class="version">
-                0.1.0.
+                0.1.1
               </div>
             
           
@@ -195,7 +195,7 @@
 
 <dl class="class">
 <dt id="pycasso.core.Solver">
-<em class="property">class </em><code class="descclassname">pycasso.core.</code><code class="descname">Solver</code><span class="sig-paren">(</span><em>x</em>, <em>y</em>, <em>lambdas=None</em>, <em>nlambda=100</em>, <em>lambda_min_ratio=None</em>, <em>lambda_min=None</em>, <em>family='gaussian'</em>, <em>penalty='l1'</em>, <em>type_gaussian='naive'</em>, <em>gamma=3</em>, <em>df=None</em>, <em>standardize=True</em>, <em>useintercept=True</em>, <em>prec=1e-07</em>, <em>max_ite=1000</em>, <em>verbose=False</em><span class="sig-paren">)</span><a class="headerlink" href="#pycasso.core.Solver" title="Permalink to this definition">¶</a></dt>
+<em class="property">class </em><code class="descclassname">pycasso.core.</code><code class="descname">Solver</code><span class="sig-paren">(</span><em>x</em>, <em>y</em>, <em>lambdas=None</em>, <em>nlambda=100</em>, <em>lambda_min_ratio=None</em>, <em>lambda_min=None</em>, <em>family='gaussian'</em>, <em>penalty='l1'</em>, <em>type_gaussian='naive'</em>, <em>gamma=3</em>, <em>df=None</em>, <em>standardize=True</em>, <em>useintercept=False</em>, <em>prec=0.0001</em>, <em>max_ite=1000</em>, <em>verbose=False</em><span class="sig-paren">)</span><a class="headerlink" href="#pycasso.core.Solver" title="Permalink to this definition">¶</a></dt>
 <dd><p>Bases: <code class="xref py py-class docutils literal"><span class="pre">object</span></code></p>
 <p>The PICASSO Solver For GLM.</p>
 <table class="docutils field-list" frame="void" rules="none">
@@ -235,7 +235,7 @@ default value is <cite>“naive”</cite>.</li>
 <li><strong>df</strong> – Maximum degree of freedom for the covariance update. The default value is <cite>m</cite>.</li>
 <li><strong>standardize</strong> – Design matrix X will be standardized to have mean zero and unit standard deviation if
 <cite>standardize = TRUE</cite>. The default value is <cite>TRUE</cite>.</li>
-<li><strong>useintercept</strong> – Whether or not to include intercept term. Default value is True.</li>
+<li><strong>useintercept</strong> – Whether or not to include intercept term. Default value is False.</li>
 <li><strong>prec</strong> – Stopping precision. The default value is 1e-7.</li>
 <li><strong>max_ite</strong> – The iteration limit. The default value is 1000.</li>
 <li><strong>verbose</strong> – Tracing information is disabled if <cite>verbose = FALSE</cite>. The default value is <cite>FALSE</cite>.</li>
@@ -265,8 +265,10 @@ default value is <cite>“naive”</cite>.</li>
 <li><strong>intercept</strong> - The value of intercepts corresponding to regularization parameters for sparse linear                 regression, and sparse logistic regression.</li>
 <li><strong>ite_lamb</strong> - Number of iterations for each lambda.</li>
 <li><strong>size_act</strong> - An array of solution sparsity (model degree of freedom).</li>
-<li><strong>train_time</strong> - The training time.</li>
+<li><strong>train_time</strong> - The training time on each lambda.</li>
+<li><strong>total_train_time</strong> - The total training time.</li>
 <li><strong>state</strong> - The training state.</li>
+<li><strong>df</strong> - The number of nonzero coefficients</li>
 </ul>
 </div></blockquote>
 </dd></dl>
@@ -360,7 +362,7 @@ If omitted, the training data of the model are used.</li>
 
   <div role="contentinfo">
     <p>
-        &copy; Copyright 2017, Haoming Jiang, Jian Ge.
+        &copy; Copyright 2017, Haoming Jiang, Jason Ge.
 
     </p>
   </div>
@@ -382,7 +384,7 @@ If omitted, the training data of the model are used.</li>
     <script type="text/javascript">
         var DOCUMENTATION_OPTIONS = {
             URL_ROOT:'./',
-            VERSION:'0.1.0.',
+            VERSION:'0.1.1',
             COLLAPSE_INDEX:false,
             FILE_SUFFIX:'.html',
             HAS_SOURCE:  true,
