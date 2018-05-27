@@ -8,7 +8,7 @@
   
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-  <title>pycasso package &mdash; pycasso 0.1.1 documentation</title>
+  <title>pycasso package &mdash; pycasso 0.1.2 documentation</title>
   
 
   
@@ -25,25 +25,18 @@
   
 
   
-  
     <link rel="stylesheet" href="_static/css/theme.css" type="text/css" />
-  
-
-  
-
-  
-        <link rel="index" title="Index"
-              href="genindex.html"/>
-        <link rel="search" title="Search" href="search.html"/>
-    <link rel="top" title="pycasso 0.1.1 documentation" href="index.html"/>
-        <link rel="prev" title="Picasso Python Package" href="README.html"/> 
+  <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
+    <link rel="prev" title="Picasso Python Package" href="README.html" /> 
 
   
   <script src="_static/js/modernizr.min.js"></script>
 
 </head>
 
-<body class="wy-body-for-nav" role="document">
+<body class="wy-body-for-nav">
 
    
   <div class="wy-grid-for-nav">
@@ -65,7 +58,7 @@
             
             
               <div class="version">
-                0.1.1
+                0.1.2
               </div>
             
           
@@ -109,7 +102,7 @@
     <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
 
       
-      <nav class="wy-nav-top" role="navigation" aria-label="top navigation">
+      <nav class="wy-nav-top" aria-label="top navigation">
         
           <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
           <a href="index.html">pycasso</a>
@@ -117,9 +110,10 @@
       </nav>
 
 
-      
       <div class="wy-nav-content">
+        
         <div class="rst-content">
+        
           
 
 
@@ -186,16 +180,9 @@
 <div class="section" id="module-pycasso.core">
 <span id="pycasso-core"></span><h2>pycasso.core<a class="headerlink" href="#module-pycasso.core" title="Permalink to this headline">¶</a></h2>
 <p>Main Interface of the package</p>
-<dl class="exception">
-<dt id="pycasso.core.PycassoError">
-<em class="property">exception </em><code class="descclassname">pycasso.core.</code><code class="descname">PycassoError</code><a class="headerlink" href="#pycasso.core.PycassoError" title="Permalink to this definition">¶</a></dt>
-<dd><p>Bases: <code class="xref py py-class docutils literal"><span class="pre">Exception</span></code></p>
-<p>Error thrown by pycasso solver.</p>
-</dd></dl>
-
 <dl class="class">
 <dt id="pycasso.core.Solver">
-<em class="property">class </em><code class="descclassname">pycasso.core.</code><code class="descname">Solver</code><span class="sig-paren">(</span><em>x</em>, <em>y</em>, <em>lambdas=None</em>, <em>nlambda=100</em>, <em>lambda_min_ratio=None</em>, <em>lambda_min=None</em>, <em>family='gaussian'</em>, <em>penalty='l1'</em>, <em>type_gaussian='naive'</em>, <em>gamma=3</em>, <em>df=None</em>, <em>standardize=True</em>, <em>useintercept=False</em>, <em>prec=0.0001</em>, <em>max_ite=1000</em>, <em>verbose=False</em><span class="sig-paren">)</span><a class="headerlink" href="#pycasso.core.Solver" title="Permalink to this definition">¶</a></dt>
+<em class="property">class </em><code class="descclassname">pycasso.core.</code><code class="descname">Solver</code><span class="sig-paren">(</span><em>x</em>, <em>y</em>, <em>lambdas=(100</em>, <em>0.05)</em>, <em>family='gaussian'</em>, <em>penalty='l1'</em>, <em>gamma=3</em>, <em>useintercept=False</em>, <em>prec=0.0001</em>, <em>max_ite=1000</em>, <em>verbose=False</em><span class="sig-paren">)</span><a class="headerlink" href="#pycasso.core.Solver" title="Permalink to this definition">¶</a></dt>
 <dd><p>Bases: <code class="xref py py-class docutils literal"><span class="pre">object</span></code></p>
 <p>The PICASSO Solver For GLM.</p>
 <table class="docutils field-list" frame="void" rules="none">
@@ -207,38 +194,26 @@
 <li><strong>y</strong> – The <em>n</em> dimensional response vector. <cite>y</cite> is numeric vector for <cite>gaussian</cite> and <cite>sqrtlasso</cite>,
 or a two-level factor for <cite>binomial</cite>, or a non-negative integer vector representing counts
 for <cite>gaussian</cite>.</li>
-<li><strong>lambdas</strong> – A sequence of decreasing positive values to control the regularization. Typical usage
-is to leave the input <cite>lambda = None</cite> and have the program compute its own <cite>lambda</cite> sequence
-based on <cite>nlambda</cite> and <cite>lambda_min_ratio</cite>. Users can also specify a sequence to override this.
-Default value is from <cite>lambda_max</cite> to <cite>lambda_min_ratio*lambda_max</cite>. The default value of
-<cite>lambda_max</cite> is the minimum regularization parameter which yields an all-zero estimates.</li>
-<li><strong>nlambda</strong> – The number of values used in lambdas. Default value is 100. (useless when <cite>lambdas</cite> is specified)</li>
-<li><strong>lambda_min_ratio</strong> – The smallest value for lambdas, as a fraction of the upper-bound (<cite>MAX</cite>) of the
-regularization parameter. The program can automatically generate <cite>lambda</cite> as a sequence of
-<cite>length = nlambda</cite> starting from <cite>MAX</cite> to <cite>lambda_min_ratio</cite> * <cite>MAX</cite> in log scale. The
-default value is <cite>0.05</cite>. <strong>Caution</strong>: logistic and poisson regression can be ill-conditioned
+<li><strong>lambdas</strong> – The parameters of controling regularization. Can be one of the following two cases: <br />
+<strong>Case1 (default)</strong>: A tuple of 2 variables (<cite>n</cite>, <cite>lambda_min_ratio</cite>), where the default values are
+(100,0.05). The program calculates <cite>lambdas</cite> as an array of <cite>n</cite> elements starting from <cite>lambda_max</cite>
+to <cite>lambda_min_ratio * lambda_max</cite> in log scale. <cite>lambda_max</cite> is the minimum regularization parameter
+which yields an all-zero estimates.
+<strong>Caution</strong>: logistic and poisson regression can be ill-conditioned
 if lambda is too small for nonconvex penalty. We suggest the user to avoid using any
-<cite>lambda_min_raito</cite> smaller than 0.05 for logistic/poisson regression under nonconvex penalty.</li>
-<li><strong>lambda_min</strong> – The smallest value for <cite>lambda</cite>. If <cite>lambda_min_ratio</cite> is provided, then it is set to
-<cite>lambda.min.ratio*MAX</cite>, where <cite>MAX</cite> is the uppperbound of the regularization parameter. The default
-value is <cite>0.05*MAX</cite>.</li>
+<cite>lambda_min_raito</cite> smaller than 0.05 for logistic/poisson regression under nonconvex penalty. <br />
+<strong>Case2</strong>: A manually specified sequence (size &gt; 2) of decreasing positive values to control the regularization.</li>
 <li><strong>family</strong> – Options for model. Sparse linear regression and sparse multivariate regression is applied if
 <cite>family = “gaussian”</cite>, sqrt lasso is applied if <cite>family = “sqrtlasso”</cite>, sparse logistic regression is
 applied if <cite>family = “binomial”</cite> and sparse poisson regression is applied if <cite>family = “poisson”</cite>.
 The default value is <cite>“gaussian”</cite>.</li>
 <li><strong>penalty</strong> – Options for regularization. Lasso is applied if <cite>method = “l1”</cite>, MCP is applied if `
 method = “mcp”` and SCAD Lasso is applied if <cite>method = “scad”</cite>. The default value is <cite>“l1”</cite>.</li>
-<li><strong>type_gaussian</strong> – Options for updating residuals in sparse linear regression. The naive update rule is
-applied if <cite>opt = “naive”</cite>, and the covariance update rule is applied if <cite>opt = “covariance”</cite>. The
-default value is <cite>“naive”</cite>.</li>
 <li><strong>gamma</strong> – The concavity parameter for MCP and SCAD. The default value is <cite>3</cite>.</li>
-<li><strong>df</strong> – Maximum degree of freedom for the covariance update. The default value is <cite>m</cite>.</li>
-<li><strong>standardize</strong> – Design matrix X will be standardized to have mean zero and unit standard deviation if
-<cite>standardize = TRUE</cite>. The default value is <cite>TRUE</cite>.</li>
 <li><strong>useintercept</strong> – Whether or not to include intercept term. Default value is False.</li>
 <li><strong>prec</strong> – Stopping precision. The default value is 1e-7.</li>
 <li><strong>max_ite</strong> – The iteration limit. The default value is 1000.</li>
-<li><strong>verbose</strong> – Tracing information is disabled if <cite>verbose = FALSE</cite>. The default value is <cite>FALSE</cite>.</li>
+<li><strong>verbose</strong> – Tracing information is disabled if <cite>verbose = False</cite>. The default value is <cite>False</cite>.</li>
 </ul>
 </td>
 </tr>
@@ -344,9 +319,7 @@ If omitted, the training data of the model are used.</li>
 
 
            </div>
-           <div class="articleComments">
-            
-           </div>
+           
           </div>
           <footer>
   
@@ -366,7 +339,7 @@ If omitted, the training data of the model are used.</li>
 
     </p>
   </div>
-  Built with <a href="http://sphinx-doc.org/">Sphinx</a> using a <a href="https://github.com/snide/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>. 
+  Built with <a href="http://sphinx-doc.org/">Sphinx</a> using a <a href="https://github.com/rtfd/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>. 
 
 </footer>
 
@@ -384,7 +357,8 @@ If omitted, the training data of the model are used.</li>
     <script type="text/javascript">
         var DOCUMENTATION_OPTIONS = {
             URL_ROOT:'./',
-            VERSION:'0.1.1',
+            VERSION:'0.1.2',
+            LANGUAGE:'None',
             COLLAPSE_INDEX:false,
             FILE_SUFFIX:'.html',
             HAS_SOURCE:  true,
@@ -403,14 +377,11 @@ If omitted, the training data of the model are used.</li>
     <script type="text/javascript" src="_static/js/theme.js"></script>
   
 
-  
-  
   <script type="text/javascript">
       jQuery(function () {
-          SphinxRtdTheme.StickyNav.enable();
+          SphinxRtdTheme.Navigation.enable(true);
       });
-  </script>
-   
+  </script> 
 
 </body>
 </html>

@@ -8,7 +8,7 @@
   
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-  <title>Picasso Python Package &mdash; pycasso 0.1.1 documentation</title>
+  <title>Picasso Python Package &mdash; pycasso 0.1.2 documentation</title>
   
 
   
@@ -25,26 +25,19 @@
   
 
   
-  
     <link rel="stylesheet" href="_static/css/theme.css" type="text/css" />
-  
-
-  
-
-  
-        <link rel="index" title="Index"
-              href="genindex.html"/>
-        <link rel="search" title="Search" href="search.html"/>
-    <link rel="top" title="pycasso 0.1.1 documentation" href="index.html"/>
-        <link rel="next" title="pycasso package" href="pycasso.html"/>
-        <link rel="prev" title="Welcome to pycasso’s documentation!" href="index.html"/> 
+  <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
+    <link rel="next" title="pycasso package" href="pycasso.html" />
+    <link rel="prev" title="Welcome to pycasso’s documentation!" href="index.html" /> 
 
   
   <script src="_static/js/modernizr.min.js"></script>
 
 </head>
 
-<body class="wy-body-for-nav" role="document">
+<body class="wy-body-for-nav">
 
    
   <div class="wy-grid-for-nav">
@@ -66,7 +59,7 @@
             
             
               <div class="version">
-                0.1.1
+                0.1.2
               </div>
             
           
@@ -113,7 +106,7 @@
     <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
 
       
-      <nav class="wy-nav-top" role="navigation" aria-label="top navigation">
+      <nav class="wy-nav-top" aria-label="top navigation">
         
           <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
           <a href="index.html">pycasso</a>
@@ -121,9 +114,10 @@
       </nav>
 
 
-      
       <div class="wy-nav-content">
+        
         <div class="rst-content">
+        
           
 
 
@@ -186,21 +180,18 @@ Be careful of issues like the system bits.</p>
 <div class="section" id="installation">
 <h2>Installation<a class="headerlink" href="#installation" title="Permalink to this headline">¶</a></h2>
 <p>In the following process, you may need to be root (<code class="docutils literal"><span class="pre">sudo</span></code>).</p>
-<p>Install from source file (Github):</p>
-<ul>
-<li><p class="first">Clone <code class="docutils literal"><span class="pre">picasso.git</span></code> via <code class="docutils literal"><span class="pre">git</span> <span class="pre">clone</span> <span class="pre">https://github.com/jasonge27/picasso.git</span></code></p>
-</li>
-<li><p class="first">Make sure you have <a class="reference external" href="https://pypi.python.org/pypi/setuptools">setuptools</a></p>
-<p>Using <strong>Makefile</strong></p>
-</li>
-<li><p class="first">Run <code class="docutils literal"><span class="pre">sudo</span> <span class="pre">make</span> <span class="pre">Pyinstall</span></code> command.</p>
-<p>Using <strong>CMAKE</strong></p>
-</li>
-<li><p class="first">Build the source file first via the <code class="docutils literal"><span class="pre">cmake</span></code> with <code class="docutils literal"><span class="pre">CMakeLists.txt</span></code> in the root directory.
-(You will see a <code class="docutils literal"><span class="pre">.so</span></code> or <code class="docutils literal"><span class="pre">.lib</span></code> file under <code class="docutils literal"><span class="pre">(root)/lib/</span></code> )</p>
-</li>
-<li><p class="first">Run <code class="docutils literal"><span class="pre">cd</span> <span class="pre">python-package;</span> <span class="pre">sudo</span> <span class="pre">python</span> <span class="pre">setup.py</span> <span class="pre">install</span></code> command.</p>
-</li>
+<p>Install from source file (Github) with Makefile:</p>
+<ul class="simple">
+<li>Clone <code class="docutils literal"><span class="pre">picasso.git</span></code> via <code class="docutils literal"><span class="pre">git</span> <span class="pre">clone</span> <span class="pre">https://github.com/jasonge27/picasso.git</span></code></li>
+<li>Make sure you have <a class="reference external" href="https://pypi.python.org/pypi/setuptools">setuptools</a></li>
+<li>Run <code class="docutils literal"><span class="pre">sudo</span> <span class="pre">make</span> <span class="pre">Pyinstall</span></code> command.</li>
+</ul>
+<p>Install from source file (Github) with CMAKE:</p>
+<ul class="simple">
+<li>Clone <code class="docutils literal"><span class="pre">picasso.git</span></code> via <code class="docutils literal"><span class="pre">git</span> <span class="pre">clone</span> <span class="pre">https://github.com/jasonge27/picasso.git</span></code></li>
+<li>Make sure you have <a class="reference external" href="https://pypi.python.org/pypi/setuptools">setuptools</a></li>
+<li>Build the source file first via the <code class="docutils literal"><span class="pre">cmake</span></code> with <code class="docutils literal"><span class="pre">CMakeLists.txt</span></code> in the root directory. (You will see a <code class="docutils literal"><span class="pre">.so</span></code> or <code class="docutils literal"><span class="pre">.lib</span></code> file under <code class="docutils literal"><span class="pre">(root)/lib/</span></code> )</li>
+<li>Run <code class="docutils literal"><span class="pre">cd</span> <span class="pre">python-package;</span> <span class="pre">sudo</span> <span class="pre">python</span> <span class="pre">setup.py</span> <span class="pre">install</span></code> command.</li>
 </ul>
 <p>Install from PyPI:</p>
 <ul class="simple">
@@ -246,9 +237,7 @@ Be careful of issues like the system bits.</p>
 
 
            </div>
-           <div class="articleComments">
-            
-           </div>
+           
           </div>
           <footer>
   
@@ -270,7 +259,7 @@ Be careful of issues like the system bits.</p>
 
     </p>
   </div>
-  Built with <a href="http://sphinx-doc.org/">Sphinx</a> using a <a href="https://github.com/snide/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>. 
+  Built with <a href="http://sphinx-doc.org/">Sphinx</a> using a <a href="https://github.com/rtfd/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>. 
 
 </footer>
 
@@ -288,7 +277,8 @@ Be careful of issues like the system bits.</p>
     <script type="text/javascript">
         var DOCUMENTATION_OPTIONS = {
             URL_ROOT:'./',
-            VERSION:'0.1.1',
+            VERSION:'0.1.2',
+            LANGUAGE:'None',
             COLLAPSE_INDEX:false,
             FILE_SUFFIX:'.html',
             HAS_SOURCE:  true,
@@ -307,14 +297,11 @@ Be careful of issues like the system bits.</p>
     <script type="text/javascript" src="_static/js/theme.js"></script>
   
 
-  
-  
   <script type="text/javascript">
       jQuery(function () {
-          SphinxRtdTheme.StickyNav.enable();
+          SphinxRtdTheme.Navigation.enable(true);
       });
-  </script>
-   
+  </script> 
 
 </body>
 </html>
