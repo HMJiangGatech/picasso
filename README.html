@@ -8,7 +8,7 @@
   
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-  <title>Picasso Python Package &mdash; pycasso 0.1.2 documentation</title>
+  <title>Picasso Python Package &mdash; pycasso 0.1.2.2 documentation</title>
   
 
   
@@ -24,8 +24,7 @@
 
   
 
-  
-    <link rel="stylesheet" href="_static/css/theme.css" type="text/css" />
+  <link rel="stylesheet" href="_static/css/theme.css" type="text/css" />
   <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
     <link rel="index" title="Index" href="genindex.html" />
     <link rel="search" title="Search" href="search.html" />
@@ -59,7 +58,7 @@
             
             
               <div class="version">
-                0.1.2
+                0.1.2.2
               </div>
             
           
@@ -174,21 +173,22 @@ the lowest estimation error among all the lambdas computed is as high as <strong
 <ul class="simple">
 <li>Linux or MacOS</li>
 </ul>
-<p>It may take lots of effort to build on Windows. One way to do it is using CMAKE and MSVC.
-Be careful of issues like the system bits.</p>
+<p><strong>Windows User:</strong> It may take lots of effort to build on Windows. One way to do it is using mingw/mingw64.
+Be careful of issues like the system bits and environment variables.
+Once the correct make tools and g++ are setted up, you can install the package from suorce with the following instruction.</p>
 </div>
 <div class="section" id="installation">
 <h2>Installation<a class="headerlink" href="#installation" title="Permalink to this headline">¶</a></h2>
 <p>In the following process, you may need to be root (<code class="docutils literal"><span class="pre">sudo</span></code>).</p>
 <p>Install from source file (Github) with Makefile:</p>
 <ul class="simple">
-<li>Clone <code class="docutils literal"><span class="pre">picasso.git</span></code> via <code class="docutils literal"><span class="pre">git</span> <span class="pre">clone</span> <span class="pre">https://github.com/jasonge27/picasso.git</span></code></li>
+<li>Clone <code class="docutils literal"><span class="pre">picasso.git</span></code> via <code class="docutils literal"><span class="pre">git</span> <span class="pre">clone</span> <span class="pre">--recurse-submodules</span> <span class="pre">https://github.com/jasonge27/picasso.git</span></code></li>
 <li>Make sure you have <a class="reference external" href="https://pypi.python.org/pypi/setuptools">setuptools</a></li>
 <li>Run <code class="docutils literal"><span class="pre">sudo</span> <span class="pre">make</span> <span class="pre">Pyinstall</span></code> command.</li>
 </ul>
 <p>Install from source file (Github) with CMAKE:</p>
 <ul class="simple">
-<li>Clone <code class="docutils literal"><span class="pre">picasso.git</span></code> via <code class="docutils literal"><span class="pre">git</span> <span class="pre">clone</span> <span class="pre">https://github.com/jasonge27/picasso.git</span></code></li>
+<li>Clone <code class="docutils literal"><span class="pre">picasso.git</span></code> via <code class="docutils literal"><span class="pre">git</span> <span class="pre">clone</span> <span class="pre">--recurse-submodules</span> <span class="pre">https://github.com/jasonge27/picasso.git</span></code></li>
 <li>Make sure you have <a class="reference external" href="https://pypi.python.org/pypi/setuptools">setuptools</a></li>
 <li>Build the source file first via the <code class="docutils literal"><span class="pre">cmake</span></code> with <code class="docutils literal"><span class="pre">CMakeLists.txt</span></code> in the root directory. (You will see a <code class="docutils literal"><span class="pre">.so</span></code> or <code class="docutils literal"><span class="pre">.lib</span></code> file under <code class="docutils literal"><span class="pre">(root)/lib/</span></code> )</li>
 <li>Run <code class="docutils literal"><span class="pre">cd</span> <span class="pre">python-package;</span> <span class="pre">sudo</span> <span class="pre">python</span> <span class="pre">setup.py</span> <span class="pre">install</span></code> command.</li>
@@ -277,7 +277,7 @@ Be careful of issues like the system bits.</p>
     <script type="text/javascript">
         var DOCUMENTATION_OPTIONS = {
             URL_ROOT:'./',
-            VERSION:'0.1.2',
+            VERSION:'0.1.2.2',
             LANGUAGE:'None',
             COLLAPSE_INDEX:false,
             FILE_SUFFIX:'.html',
@@ -292,10 +292,7 @@ Be careful of issues like the system bits.</p>
 
   
 
-  
-  
-    <script type="text/javascript" src="_static/js/theme.js"></script>
-  
+  <script type="text/javascript" src="_static/js/theme.js"></script>
 
   <script type="text/javascript">
       jQuery(function () {
